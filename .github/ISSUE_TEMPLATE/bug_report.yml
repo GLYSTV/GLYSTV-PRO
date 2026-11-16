@@ -1,0 +1,44 @@
+name: 🐛 Reporte de error
+description: Algo no funciona como debería
+labels: [bug]
+body:
+  - type: textarea
+    id: descripcion
+    attributes:
+      label: ¿Qué ocurre?
+      description: Describe el problema y qué esperabas que pasara.
+    validations:
+      required: true
+  - type: textarea
+    id: pasos
+    attributes:
+      label: Pasos para reproducirlo
+      placeholder: |
+        1. Entro en…
+        2. Pulso…
+        3. Aparece…
+    validations:
+      required: true
+  - type: dropdown
+    id: dispositivo
+    attributes:
+      label: Dispositivo
+      options: [Navegador de escritorio, Móvil, Android TV / Fire TV, Smart TV (Tizen / webOS), Otro]
+    validations:
+      required: true
+  - type: input
+    id: navegador
+    attributes:
+      label: Navegador y versión
+      placeholder: Chrome 125, Safari 17, TV Bro 2.x…
+  - type: dropdown
+    id: despliegue
+    attributes:
+      label: Forma de despliegue
+      options: [Docker Compose en VPS, Railway, Render, npm run dev, Otro]
+  - type: textarea
+    id: logs
+    attributes:
+      label: Registros
+      description: Salida de `docker compose logs app` o de la consola del navegador (sin contraseñas ni URLs de proveedor).
+      render: shell
