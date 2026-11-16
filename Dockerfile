@@ -5,12 +5,12 @@
 #  Ejecutar:   ver docker-compose.yml
 # ───────────────────────────────────────────────────────────────
 
-FROM node:22-bookworm-slim AS deps
+FROM node:26-bookworm-slim AS deps
 WORKDIR /app
 COPY package.json ./
 RUN npm install --no-audit --no-fund
 
-FROM node:22-bookworm-slim AS builder
+FROM node:26-bookworm-slim AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1 \
     DOCKER_BUILD=1 \
@@ -22,7 +22,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
 
-FROM node:22-bookworm-slim AS runner
+FROM node:26-bookworm-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
