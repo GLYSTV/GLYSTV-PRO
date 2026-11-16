@@ -8,7 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
-          unzip -o GLYSTV-PRO.zip
+          unzip -o GLYSTV-PRO.zip -x ".github/workflows/*"
           rm GLYSTV-PRO.zip
       - run: |
           git config user.name "github-actions"
