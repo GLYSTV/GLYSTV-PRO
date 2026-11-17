@@ -53,6 +53,32 @@ input,select{padding:11px;border-radius:12px;border:1px solid var(--line);backgr
 #ts{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#000c;color:#fff;padding:10px 16px;border-radius:20px;z-index:50;font-size:14px}
 @media(max-width:720px){.dh{grid-template-columns:1fr}.dh .mdp{order:-1}.mdp.p{margin:0 auto}}
 @media(max-width:720px){.tl{grid-template-columns:repeat(3,1fr)}#root{flex-direction:column-reverse}#sb{width:100%;flex-direction:row;border-right:0;border-top:1px solid var(--line);padding:6px}.nv{flex-direction:column;gap:2px;font-size:11px;padding:6px 10px}.bc{display:none}.clk small{display:none}.rw .pc{width:100px}}
+
+body{font-size:13px}
+#sb{width:160px;padding:8px;gap:2px}.nv{padding:8px 10px;font-size:13px;gap:10px}.bc{font-size:11px;padding:8px}.bc b{font-size:13px}
+#hd{padding:4px 12px;gap:10px}#hd img{height:34px}.clk b{font-size:15px}.clk{padding:0 10px}.ib{font-size:18px}.pfb .av{width:28px;height:28px}
+#ct{padding:0 12px 10px}.h{font-size:16px;margin:10px 0 6px}
+.rw .pc{width:92px}.grid{grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.pc .pn{font-size:11px;margin-top:3px;max-height:26px}
+.st{width:22px;height:22px;font-size:12px;top:3px;right:3px;opacity:.7}
+.tl div{font-size:11px;padding:10px 2px}.tl i{font-size:20px}
+input,select{padding:8px;font-size:13px}button.b{padding:8px 12px;font-size:13px}
+#dt{padding:6px 12px}
+.dtop{display:flex;gap:10px;align-items:center}.dtop .b{padding:5px 10px;font-size:12px;flex:none}
+.dtop h1{margin:0;font-size:17px;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dtop h1 b{font-size:13px;margin-left:6px}
+.dh{grid-template-columns:1fr auto;gap:12px;margin-top:6px}
+.ml{margin:3px 0;font-size:12px;line-height:1.3}.chip{padding:1px 8px;font-size:11px;margin:0 4px 2px 0}
+.pl2{-webkit-line-clamp:2}
+.mdp:not(.p){height:28vh;aspect-ratio:16/9}.mdp.p{height:30vh;aspect-ratio:2/3;max-width:none;margin:0}
+.mdp i{width:36px;height:36px;font-size:15px}
+.ab{gap:8px;margin:8px 0}.ab button{padding:7px 12px;font-size:12px}
+.rg{gap:14px}.rg a{font-size:13px}
+.en{padding:6px 0;gap:6px}.en button{min-width:40px;height:30px;font-size:13px;border-radius:5px}
+#dt .h{font-size:13px;margin:6px 0 4px}#dt .rw{gap:8px}#dt .rw .pc{width:58px}#dt .pc .pn{font-size:9.5px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-height:none}
+.ac{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ab{margin:6px 0 0}.dh{margin-top:4px}
+.mdp.p{height:27vh}.mdp:not(.p){height:25vh}
+#dt .rw .pc{width:46px}
 </style></head><body>
 <div id="lg"></div>
 <div id="root"><div id="sb"></div><div id="mn"><div id="hd"><img src="logo.png" alt="GLYSTV-PRO"><div class="sp"></div><button class="ib" data-v="search">🔍</button><div class="clk"><b id="tm"></b><small id="dy"></small></div><div class="pfb" id="pb"><div class="av" id="pa"></div><span id="pn2"></span> ▾</div></div><div id="pm"><div data-v="prof">Cambiar perfil</div><div data-v="out">Cerrar sesión</div></div><div id="ct"></div></div></div>
@@ -203,11 +229,11 @@ async function detail(it){
   const bd=Array.isArray(i.backdrop_path)?i.backdrop_path[0]:i.backdrop_path;
   const rating=g('rating')||g('rating_5based'),meta=[g('country'),g('releasedate')||g('releaseDate')||g('release_date')].filter(Boolean).join(' | ');
   const chips=g('genre').split(/[,/|]/).map(x=>x.trim()).filter(Boolean).map(x=>`<span class="chip">${esc(x)}</span>`).join('');
-  const line=(k,v)=>v?`<div class="ml"><span>${k}:</span>${esc(v)}</div>`:'';
+  const line=(k,v)=>v?`<div class="ml ac"><span>${k}:</span>${esc(v)}</div>`:'';
   const plot=g('plot')||g('description'),img=isS?(g('cover')||it.logo):(bd||g('movie_image')||it.logo);
   const fav=favs().some(x=>x.id==it.id);R[it.id]=it;
-  d.innerHTML=back+`<div class="dh"><div><h1>${esc(it.name)}${rating?`<b>${esc(rating)}</b>`:''}</h1>${meta?`<div class="ml" style="color:#aab6d8">${esc(meta)}</div>`:''}${chips?`<div class="ml"><span>Género:</span>${chips}</div>`:''}${line('Director',g('director'))}${line('Actores',g('cast')||g('actors'))}${plot?`<div class="ml"><span>Sinopsis:</span><div class="pl2" id="pt">${esc(plot)}</div>${plot.length>160?'<a id="mz" style="color:#2da1ff;font-weight:700;cursor:pointer">Más</a>':''}</div>`:''}</div><div class="mdp${isS?' p':''}" id="mdp"><img src="${esc(img||'')}" onerror="this.style.opacity=0">${isS?'':'<i>▶</i>'}</div></div>
-  <div class="ab"><button class="go" id="ba">▶ Reproducir</button><button id="bf">${fav?'★':'☆'} Favorito</button><button id="bp">⚙ Reproductor</button></div><div id="sx"></div><div class="h"><span>Quizás te guste</span></div><div class="rw" id="sg"></div>`;
+  d.innerHTML=`<div class="dtop">${back}<h1>${esc(it.name)}${rating?`<b>${esc(rating)}</b>`:''}</h1></div><div class="dh"><div>${meta?`<div class="ml" style="color:#aab6d8">${esc(meta)}</div>`:''}${chips?`<div class="ml"><span>Género:</span>${chips}</div>`:''}${line('Director',g('director'))}${line('Actores',g('cast')||g('actors'))}${plot?`<div class="ml"><span>Sinopsis:</span><div class="pl2" id="pt">${esc(plot)}</div>${plot.length>160?'<a id="mz" style="color:#2da1ff;font-weight:700;cursor:pointer">Más</a>':''}</div>`:''}<div class="ab"><button class="go" id="ba">▶ Reproducir</button><button id="bf">${fav?'★':'☆'} Favorito</button><button id="bp">⚙ Reproductor</button></div></div><div class="mdp${isS?' p':''}" id="mdp"><img src="${esc(img||'')}" onerror="this.style.opacity=0">${isS?'':'<i>▶</i>'}</div></div>
+  <div id="sx"></div><div class="h"><span>Quizás te guste</span></div><div class="rw" id="sg"></div>`;
   if($('#mz'))$('#mz').onclick=()=>{const o=$('#pt').classList.toggle('open');$('#mz').textContent=o?'Menos':'Más'};
   $('#bf').onclick=()=>{$('#bf').textContent=(togFav(it)?'★':'☆')+' Favorito'};$('#bp').onclick=chooser;
   let go=()=>play(it);
@@ -217,7 +243,7 @@ async function detail(it){
     const ks=Object.keys(ep);let sk=ks[0],rg=0;
     if(!ks.length)$('#sx').innerHTML='<div class="mut">No hay episodios disponibles.</div>';
     const draw=()=>{const L=ep[sk]||[],n=Math.ceil(L.length/20);
-      $('#sx').innerHTML=`<div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap"><select id="se" style="width:auto;min-width:170px;font-size:17px;padding:14px">${ks.map(k=>`<option value="${k}"${k==sk?' selected':''}>Temporada ${k}</option>`).join('')}</select>${n>1?`<div class="rg">${Array.from({length:n},(_,j)=>`<a data-g="${j}" class="${j==rg?'on':''}">${j*20+1}-${Math.min(L.length,(j+1)*20)}</a>`).join('')}</div>`:''}</div><div class="en">${L.slice(rg*20,rg*20+20).map(e=>{R['e'+e.id]={id:'e'+e.id,name:`${it.name} T${sk}E${e.episode_num}`,logo:it.logo,type:'movie',url:`${C.url}/series/${enc(C.user)}/${enc(C.pass)}/${e.id}.${e.container_extension||'mp4'}`};return `<button data-e="e${e.id}" title="${esc(e.title||'')}">${esc(e.episode_num)}</button>`}).join('')}</div>`;
+      $('#sx').innerHTML=`<div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap"><select id="se" style="width:auto;min-width:120px;font-size:12px;padding:6px 8px">${ks.map(k=>`<option value="${k}"${k==sk?' selected':''}>Temporada ${k}</option>`).join('')}</select>${n>1?`<div class="rg">${Array.from({length:n},(_,j)=>`<a data-g="${j}" class="${j==rg?'on':''}">${j*20+1}-${Math.min(L.length,(j+1)*20)}</a>`).join('')}</div>`:''}</div><div class="en">${L.slice(rg*20,rg*20+20).map(e=>{R['e'+e.id]={id:'e'+e.id,name:`${it.name} T${sk}E${e.episode_num}`,logo:it.logo,type:'movie',url:`${C.url}/series/${enc(C.user)}/${enc(C.pass)}/${e.id}.${e.container_extension||'mp4'}`};return `<button data-e="e${e.id}" title="${esc(e.title||'')}">${esc(e.episode_num)}</button>`}).join('')}</div>`;
       $('#se').onchange=e=>{sk=e.target.value;rg=0;draw()};document.querySelectorAll('[data-g]').forEach(a=>a.onclick=()=>{rg=+a.dataset.g;draw()});
       go=()=>{const e=L[rg*20];if(e)play(R['e'+e.id])};
     };
