@@ -169,7 +169,7 @@ const pref=()=>LS.get('eng',exo()?4:1);
 function play(it,mode){
   CUR=it;let m=mode||pref();
   pushHist({id:it.id,name:it.name,logo:it.logo,type:it.type,url:it.url,vid:it.vid,sid:it.sid,cat:it.cat});
-  if(m==4){if(exo()){exo().play({url:it.url,title:it.name}).catch(()=>toast('No se pudo abrir ExoPlayer'));return}m=1;toast('ExoPlayer no está en esta versión')}
+  if(m==4){if(exo()){exo().play({url:it.url,alt:(it.type=='live'&&/\.m3u8$/.test(it.url))?it.url.replace(/\.m3u8$/,'.ts'):'',title:it.name}).catch(()=>toast('No se pudo abrir ExoPlayer'));return}m=1;toast('ExoPlayer no está en esta versión')}
   if(m==3){ext(it.url);toast('Abriendo reproductor externo...');return}
   mode=it.type=='live'?m:1;
   const v=$('#pv'),msg=t=>$('#pe').textContent=t;

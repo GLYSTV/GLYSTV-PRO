@@ -19,6 +19,7 @@ public class ExoPlayerPlugin extends Plugin {
         Intent i = new Intent(getContext(), PlayerActivity.class);
         i.putExtra("url", url);
         i.putExtra("title", call.getString("title", ""));
+        i.putExtra("alt", call.getString("alt", ""));
         getActivity().startActivity(i);
         call.resolve();
     }

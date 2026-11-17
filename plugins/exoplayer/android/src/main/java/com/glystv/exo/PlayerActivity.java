@@ -19,6 +19,8 @@ import androidx.media3.ui.PlayerView;
 public class PlayerActivity extends Activity {
     private ExoPlayer player;
     private PlayerView view;
+    private String alt;
+    private boolean triedAlt = false;
 
     @Override
     protected void onCreate(Bundle b) {
@@ -31,6 +33,7 @@ public class PlayerActivity extends Activity {
         hideUi();
 
         String url = getIntent().getStringExtra("url");
+        alt = getIntent().getStringExtra("alt");
         DefaultHttpDataSource.Factory http = new DefaultHttpDataSource.Factory()
                 .setUserAgent("Mozilla/5.0 (Linux; Android 13) GLYSTV-PRO")
                 .setAllowCrossProtocolRedirects(true)
@@ -43,8 +46,18 @@ public class PlayerActivity extends Activity {
         player.addListener(new Player.Listener() {
             @Override
             public void onPlayerError(PlaybackException e) {
+                if (!triedAlt && alt != null && !alt.isEmpty()) {
+                    triedAlt = true;
+                    Toast.makeText(PlayerActivity.this, "Probando formato alterno (.ts)...", Toast.LENGTH_SHORT).show();
+                    player.setMediaItem(MediaItem.fromUri(alt));
+                    player.prepare();
+                    player.setPlayWhenReady(true);
+                    return;
+                }
+                String cause = e.getCause() != null ? String.valueOf(e.getCause().getMessage()) : "";
                 Toast.makeText(PlayerActivity.this,
-                        "No se pudo reproducir: " + e.getErrorCodeName(), Toast.LENGTH_LONG).show();
+                        "No se pudo reproducir: " + e.getErrorCodeName() + (cause.isEmpty() ? "" : "\n" + cause),
+                        Toast.LENGTH_LONG).show();
             }
         });
         player.setMediaItem(MediaItem.fromUri(url));
