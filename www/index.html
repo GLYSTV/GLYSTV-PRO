@@ -174,6 +174,16 @@ function profiles(){
   if(!PF.length)$('#np').click();
 }
 const REPO='GLYSTV/Ultra-4k',APK=`https://github.com/${REPO}/releases/latest/download/GLYSTV-PRO.apk`;
+function updApk(){
+  const p=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.ExoPlayer;
+  if(p&&p.installApk){
+    toast('Descargando actualización...');
+    p.installApk({url:APK}).then(r=>{
+      if(r&&r.status=='permiso')toast('Activa "Permitir de esta fuente" y vuelve a presionar Descargar');
+    }).catch(()=>{p.openUrl?p.openUrl({url:APK}):window.open(APK,'_system')});
+  }else if(p&&p.openUrl){p.openUrl({url:APK});toast('Abriendo descarga...')}
+  else{window.open(APK,'_system');toast('Abriendo descarga...')}
+}
 async function myBuild(){try{const j=await(await fetch('version.json')).json();return +j.build||0}catch(e){return 0}}
 async function checkUpdate(manual){
   const um=$('#um');if(manual&&um)um.textContent='Buscando...';
@@ -181,10 +191,10 @@ async function checkUpdate(manual){
     const mine=await myBuild(),r=await(await fetch(`https://api.github.com/repos/${REPO}/releases/latest`)).json();
     const last=+((String(r.name||'').match(/(\d+)\s*$/)||[])[1]||0);if(!last)throw 0;
     if(last>mine){
-      if(manual&&um){um.innerHTML=`Hay una versión nueva (build ${last}).<div class="row"><button class="b" id="ud">Descargar e instalar</button></div>`;$('#ud').onclick=()=>{ext(APK);toast('Descargando...')}}
+      if(manual&&um){um.innerHTML=`Hay una versión nueva (build ${last}).<div class="row"><button class="b" id="ud">Descargar e instalar</button></div>`;$('#ud').onclick=updApk}
       else toast('Hay una versión nueva. Ve a Ajustes → Buscar actualización');
     }else if(manual&&um)um.textContent='Ya tienes la última versión.';
-  }catch(e){if(manual&&um){um.innerHTML='No se pudo comprobar.<div class="row"><button class="b s" id="ud">Descargar la última versión</button></div>';$('#ud').onclick=()=>ext(APK)}}
+  }catch(e){if(manual&&um){um.innerHTML='No se pudo comprobar.<div class="row"><button class="b s" id="ud">Descargar la última versión</button></div>';$('#ud').onclick=updApk}}
 }
 function start(){
   $('#lg').style.display='none';$('#root').style.display='flex';

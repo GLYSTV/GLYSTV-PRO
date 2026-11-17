@@ -133,4 +133,4 @@ public class ExoPlayerPlugin extends Plugin {
             call.reject("error: " + e.getMessage());
         }
     }
-                            }
+}
