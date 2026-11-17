@@ -14,7 +14,7 @@ body{background:radial-gradient(circle at 70% 0,#0b1d4a,var(--bg) 60%) fixed;col
 .bc{margin-top:auto;border:1px solid var(--blue);border-radius:16px;padding:12px;font-size:13px;box-shadow:0 0 12px #2d7cff55}.bc b{font-size:15px}.bc b span{color:var(--blue)}
 #mn{flex:1;min-width:0;display:flex;flex-direction:column}
 #hd{display:flex;align-items:center;gap:14px;padding:8px 16px}
-#hd img,.lw img{mix-blend-mode:screen}#hd img{height:46px;max-width:55vw;object-fit:contain}
+#hd img,.lw img{mix-blend-mode:screen}#hd img{height:46px;max-width:calc(55*var(--w));object-fit:contain}
 .sp{flex:1}.clk{text-align:right;line-height:1.2;border-left:1px solid var(--line);border-right:1px solid var(--line);padding:0 14px}.clk b{font-size:18px;display:block}.clk small{color:var(--mut)}
 .ib{background:none;border:0;color:var(--tx);font-size:22px;padding:6px}
 .pfb{display:flex;gap:8px;align-items:center;cursor:pointer;position:relative}.pfb .av{width:34px;height:34px;border-radius:50%;background:var(--blue);display:grid;place-items:center;font-weight:800}
@@ -69,7 +69,7 @@ input,select{padding:8px;font-size:13px}button.b{padding:8px 12px;font-size:13px
 .dh{grid-template-columns:1fr auto;gap:12px;margin-top:6px}
 .ml{margin:3px 0;font-size:12px;line-height:1.3}.chip{padding:1px 8px;font-size:11px;margin:0 4px 2px 0}
 .pl2{-webkit-line-clamp:2}
-.mdp:not(.p){height:28vh;aspect-ratio:16/9}.mdp.p{height:30vh;aspect-ratio:2/3;max-width:none;margin:0}
+.mdp:not(.p){height:calc(28*var(--u));aspect-ratio:16/9}.mdp.p{height:calc(30*var(--u));aspect-ratio:2/3;max-width:none;margin:0}
 .mdp i{width:36px;height:36px;font-size:15px}
 .ab{gap:8px;margin:8px 0}.ab button{padding:7px 12px;font-size:12px}
 .rg{gap:14px}.rg a{font-size:13px}
@@ -77,16 +77,16 @@ input,select{padding:8px;font-size:13px}button.b{padding:8px 12px;font-size:13px
 #dt .h{font-size:13px;margin:6px 0 4px}#dt .rw{gap:8px}#dt .rw .pc{width:58px}#dt .pc .pn{font-size:9.5px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-height:none}
 .ac{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ab{margin:6px 0 0}.dh{margin-top:4px}
-.mdp.p{height:27vh}.mdp:not(.p){height:25vh}
+.mdp.p{height:calc(27*var(--u))}.mdp:not(.p){height:calc(25*var(--u))}
 #dt .rw .pc{width:46px}
 
-:root{--sat:max(env(safe-area-inset-top,0px),var(--safe-area-inset-top,0px),24px);--sar:max(env(safe-area-inset-right,0px),var(--safe-area-inset-right,0px),26px);--sal:max(env(safe-area-inset-left,0px),var(--safe-area-inset-left,0px),0px)}
+:root{--u:calc(1*var(--u));--w:calc(1*var(--w));--sat:max(env(safe-area-inset-top,0px),var(--safe-area-inset-top,0px),24px);--sar:max(env(safe-area-inset-right,0px),var(--safe-area-inset-right,0px),26px);--sal:max(env(safe-area-inset-left,0px),var(--safe-area-inset-left,0px),0px)}
 #root{padding:var(--sat) var(--sar) env(safe-area-inset-bottom,0px) var(--sal)}
 #dt{padding:var(--sat) var(--sar) 4px calc(12px + var(--sal))}
 .dh>div{min-width:0}
 .dtop h1{font-size:16px}.dtop h1 b{font-size:12px}.dtop .b{padding:4px 9px;font-size:11px}
 .ml{font-size:11.5px;margin:2px 0}.chip{font-size:10.5px;padding:0 7px}
-.mdp:not(.p){height:40vh;max-width:44vw}.mdp.p{height:36vh;max-width:30vw}
+.mdp:not(.p){height:calc(40*var(--u));max-width:calc(44*var(--w))}.mdp.p{height:calc(36*var(--u));max-width:calc(30*var(--w))}
 .mdp i{width:46px;height:46px;font-size:19px}
 .ab{margin:5px 0 0}.ab button{padding:6px 11px;font-size:11.5px}
 .rg a{font-size:12px}.en{padding:4px 0}.en button{min-width:36px;height:26px;font-size:12px}
@@ -94,17 +94,9 @@ input,select{padding:8px;font-size:13px}button.b{padding:8px 12px;font-size:13px
 #dt .h{font-size:12.5px;margin:4px 0 3px}
 #dt .rw .pc{width:46px}#sg .st{display:none}#dt .pc .pn{font-size:9px;margin-top:2px}
 
-/* Detalle horizontal: texto en 3 líneas y cuadro del reproductor siempre visible */
-#dt{overflow-x:hidden}
-.dh{grid-template-columns:minmax(0,1fr) auto!important;align-items:start}
-.dh>div{min-width:0;overflow:hidden}
-.ml{margin:2px 0!important;line-height:1.25!important}
-.ml.ac{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pl2,.pl2.open{display:-webkit-box!important;-webkit-line-clamp:3!important;-webkit-box-orient:vertical;overflow:hidden}
-#mz{display:none}
-.mdp:not(.p){height:34vh!important;max-width:40vw!important;flex:none}
-.mdp.p{height:34vh!important;max-width:28vw!important;flex:none}
-.ab{flex-wrap:nowrap!important;overflow:hidden}.ab button{white-space:nowrap}
+.nv:focus,.pc:focus,.tl>div:focus,.pf:focus,.rg a:focus,.ib:focus,.pfb:focus,.mdp:focus,#pm div:focus,button:focus,select:focus,input:focus{outline:3px solid #6fd0ff;outline-offset:2px;border-radius:8px}
+.tv .mdp:not(.p){height:calc(44*var(--u));max-width:calc(42*var(--w))}.tv .mdp.p{height:calc(42*var(--u));max-width:calc(30*var(--w))}
+.tv #dt .rw .pc{width:58px}.tv .mdp i{width:56px;height:56px;font-size:24px}
 </style></head><body>
 <div id="lg"></div>
 <div id="root"><div id="sb"></div><div id="mn"><div id="hd"><img src="logo.png" alt="GLYSTV-PRO"><div class="sp"></div><button class="ib" data-v="search">🔍</button><div class="clk"><b id="tm"></b><small id="dy"></small></div><div class="pfb" id="pb"><div class="av" id="pa"></div><span id="pn2"></span> ▾</div></div><div id="pm"><div data-v="prof">Cambiar perfil</div><div data-v="out">Cerrar sesión</div></div><div id="ct"></div></div></div>
@@ -112,6 +104,7 @@ input,select{padding:8px;font-size:13px}button.b{padding:8px 12px;font-size:13px
 <div id="pl"><div class="bar"><button class="b s" id="pbk">← Volver</button><span id="pn"></span><button class="b" id="p1">Rep. 1</button><button class="b s" id="p2">Rep. 2</button><button class="b s" id="p4">Exo</button><button class="b s" id="px">Externo ↗</button></div><video id="pv" controls autoplay playsinline poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"></video><div id="pe"></div></div>
 <script src="hls.min.js"></script>
 <script>
+(()=>{const z=Math.min(2.2,innerWidth/850);if(z>1.12){document.documentElement.style.zoom=z;document.documentElement.style.setProperty('--u',(1/z)+'vh');document.documentElement.style.setProperty('--w',(1/z)+'vw');document.documentElement.classList.add('tv')}})();
 const $=s=>document.querySelector(s),enc=encodeURIComponent;
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LS={get:(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))};
@@ -130,8 +123,8 @@ function login(err){
   <div id="fx"><label>Servidor (ej: http://servidor.com:8080)</label><input id="u" value="${esc(c.url||'')}" autocapitalize="off">
   <label>Usuario</label><input id="us" value="${esc(c.user||'')}" autocapitalize="off"><label>Contraseña</label><input id="pw" type="password" value="${esc(c.pass||'')}"></div>
   <div id="fm" style="display:none"><label>Enlace de la lista M3U</label><input id="m" value="${esc(c.m3u||'')}" autocapitalize="off"></div>
-  <button class="b" id="go" style="width:100%;margin-top:18px">Entrar</button><div class="err" id="er">${esc(err||'')}</div></div></div>`;
-  const t=$('#t');t.value=c.type||'x';const sw=()=>{$('#fx').style.display=t.value=='x'?'':'none';$('#fm').style.display=t.value=='m'?'':'none'};sw();t.onchange=sw;
+  <button class="b" id="go" style="width:100%;margin-top:18px">Entrar</button><button class="b s" id="qrb" style="width:100%;margin-top:10px">📱 Ingresar con QR (desde tu teléfono)</button><div class="err" id="er">${esc(err||'')}</div></div></div>`;
+  $('#qrb').onclick=qrLogin;const t=$('#t');t.value=c.type||'x';const sw=()=>{$('#fx').style.display=t.value=='x'?'':'none';$('#fm').style.display=t.value=='m'?'':'none'};sw();t.onchange=sw;
   $('#go').onclick=async()=>{
     const n={type:t.value,url:$('#u').value.trim().replace(/\/+$/,''),user:$('#us').value.trim(),pass:$('#pw').value,m3u:$('#m').value.trim()};
     if(n.type=='x'&&(!n.url||!n.user||!n.pass))return $('#er').textContent='Completa servidor, usuario y contraseña.';
@@ -174,16 +167,6 @@ function profiles(){
   if(!PF.length)$('#np').click();
 }
 const REPO='GLYSTV/Ultra-4k',APK=`https://github.com/${REPO}/releases/latest/download/GLYSTV-PRO.apk`;
-function updApk(){
-  const p=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.ExoPlayer;
-  if(p&&p.installApk){
-    toast('Descargando actualización...');
-    p.installApk({url:APK}).then(r=>{
-      if(r&&r.status=='permiso')toast('Activa "Permitir de esta fuente" y vuelve a presionar Descargar');
-    }).catch(()=>{p.openUrl?p.openUrl({url:APK}):window.open(APK,'_system')});
-  }else if(p&&p.openUrl){p.openUrl({url:APK});toast('Abriendo descarga...')}
-  else{window.open(APK,'_system');toast('Abriendo descarga...')}
-}
 async function myBuild(){try{const j=await(await fetch('version.json')).json();return +j.build||0}catch(e){return 0}}
 async function checkUpdate(manual){
   const um=$('#um');if(manual&&um)um.textContent='Buscando...';
@@ -191,10 +174,10 @@ async function checkUpdate(manual){
     const mine=await myBuild(),r=await(await fetch(`https://api.github.com/repos/${REPO}/releases/latest`)).json();
     const last=+((String(r.name||'').match(/(\d+)\s*$/)||[])[1]||0);if(!last)throw 0;
     if(last>mine){
-      if(manual&&um){um.innerHTML=`Hay una versión nueva (build ${last}).<div class="row"><button class="b" id="ud">Descargar e instalar</button></div>`;$('#ud').onclick=updApk}
+      if(manual&&um){um.innerHTML=`Hay una versión nueva (build ${last}).<div class="row"><button class="b" id="ud">Descargar e instalar</button></div>`;$('#ud').onclick=()=>{ext(APK);toast('Descargando...')}}
       else toast('Hay una versión nueva. Ve a Ajustes → Buscar actualización');
     }else if(manual&&um)um.textContent='Ya tienes la última versión.';
-  }catch(e){if(manual&&um){um.innerHTML='No se pudo comprobar.<div class="row"><button class="b s" id="ud">Descargar la última versión</button></div>';$('#ud').onclick=updApk}}
+  }catch(e){if(manual&&um){um.innerHTML='No se pudo comprobar.<div class="row"><button class="b s" id="ud">Descargar la última versión</button></div>';$('#ud').onclick=()=>ext(APK)}}
 }
 function start(){
   $('#lg').style.display='none';$('#root').style.display='flex';
@@ -314,5 +297,75 @@ document.addEventListener('click',e=>{
 });
 $('#pbk').onclick=()=>history.back();
 onpopstate=()=>{if($('#pl').style.display=='flex'){CUR=null;stop();$('#pl').style.display='none'}else $('#dt').style.display='none'};
+function qrMake(text){
+  const D=new TextEncoder().encode(text),ECC=[-1,10,16,26,18,24,16,18,22,22,26],NB=[-1,1,1,1,2,2,4,4,4,5,5];
+  const nAl=v=>v==1?0:Math.floor(v/7)+2;
+  const raw=v=>{let r=(16*v+128)*v+64;if(v>=2){const a=nAl(v);r-=(25*a-10)*a-55;if(v>=7)r-=36}return r};
+  const ndc=v=>Math.floor(raw(v)/8)-ECC[v]*NB[v];
+  let ver=1;for(;ver<=10;ver++){if(4+(ver<10?8:16)+8*D.length<=ndc(ver)*8)break}
+  if(ver>10)throw new Error('texto largo');
+  const bits=[],push=(x,n)=>{for(let i=n-1;i>=0;i--)bits.push((x>>>i)&1)};
+  push(4,4);push(D.length,ver<10?8:16);D.forEach(b=>push(b,8));
+  const cap=ndc(ver)*8;push(0,Math.min(4,cap-bits.length));push(0,(8-bits.length%8)%8);
+  const data=[];for(let i=0;i<bits.length;i+=8){let b=0;for(let j=0;j<8;j++)b=(b<<1)|bits[i+j];data.push(b)}
+  for(let p=0xEC;data.length<ndc(ver);p^=0xEC^0x11)data.push(p);
+  const mul=(x,y)=>{let z=0;for(let i=7;i>=0;i--){z=(z<<1)^((z>>>7)*0x11D);z^=((y>>>i)&1)*x}return z};
+  const el=ECC[ver],nb=NB[ver],rc=Math.floor(raw(ver)/8),ns=nb-rc%nb,sl=Math.floor(rc/nb);
+  const div=new Array(el).fill(0);div[el-1]=1;let root=1;
+  for(let i=0;i<el;i++){for(let j=0;j<el;j++){div[j]=mul(div[j],root);if(j+1<el)div[j]^=div[j+1]}root=mul(root,2)}
+  const blocks=[];for(let i=0,k=0;i<nb;i++){const dl=sl-el+(i<ns?0:1),dat=data.slice(k,k+dl);k+=dl;
+    const r=new Array(el).fill(0);for(const b of dat){const f=b^r.shift();r.push(0);div.forEach((c,x)=>r[x]^=mul(c,f))}
+    if(i<ns)dat.push(0);blocks.push(dat.concat(r))}
+  const cw=[];for(let i=0;i<blocks[0].length;i++)blocks.forEach((b,j)=>{if(i!=sl-el||j>=ns)cw.push(b[i])});
+  const N=ver*4+17,M=[],F=[];for(let i=0;i<N;i++){M.push(new Array(N).fill(false));F.push(new Array(N).fill(false))}
+  const sf=(x,y,d)=>{M[y][x]=d;F[y][x]=true},bit=(x,i)=>((x>>>i)&1)!=0;
+  for(let i=0;i<N;i++){sf(6,i,i%2==0);sf(i,6,i%2==0)}
+  const fnd=(x,y)=>{for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){const d=Math.max(Math.abs(dx),Math.abs(dy)),xx=x+dx,yy=y+dy;if(xx>=0&&xx<N&&yy>=0&&yy<N)sf(xx,yy,d!=2&&d!=4)}};
+  fnd(3,3);fnd(N-4,3);fnd(3,N-4);
+  const na=nAl(ver),pos=[];if(na){const st=ver==32?26:Math.ceil((ver*4+4)/(na*2-2))*2;pos.push(6);for(let p=N-7;pos.length<na;p-=st)pos.splice(1,0,p)}
+  pos.forEach((a,i)=>pos.forEach((b,j)=>{if((i==0&&j==0)||(i==0&&j==na-1)||(i==na-1&&j==0))return;for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)sf(a+dx,b+dy,Math.max(Math.abs(dx),Math.abs(dy))!=1)}));
+  const fmt=m=>{let r=m;for(let i=0;i<10;i++)r=(r<<1)^((r>>>9)*0x537);const b=((m<<10)|r)^0x5412;
+    for(let i=0;i<=5;i++)sf(8,i,bit(b,i));sf(8,7,bit(b,6));sf(8,8,bit(b,7));sf(7,8,bit(b,8));for(let i=9;i<15;i++)sf(14-i,8,bit(b,i));
+    for(let i=0;i<8;i++)sf(N-1-i,8,bit(b,i));for(let i=8;i<15;i++)sf(8,N-15+i,bit(b,i));sf(8,N-8,true)};
+  fmt(0);
+  if(ver>=7){let r=ver;for(let i=0;i<12;i++)r=(r<<1)^((r>>>11)*0x1F25);const b=(ver<<12)|r;for(let i=0;i<18;i++){const d=bit(b,i),a=N-11+i%3,c=Math.floor(i/3);sf(a,c,d);sf(c,a,d)}}
+  let i=0;for(let right=N-1;right>=1;right-=2){if(right==6)right=5;for(let v=0;v<N;v++)for(let j=0;j<2;j++){const x=right-j,up=((right+1)&2)==0,y=up?N-1-v:v;if(!F[y][x]&&i<cw.length*8){M[y][x]=bit(cw[i>>>3],7-(i&7));i++}}}
+  const mk=m=>{for(let y=0;y<N;y++)for(let x=0;x<N;x++){let inv=[(x+y)%2==0,y%2==0,x%3==0,(x+y)%3==0,(Math.floor(x/3)+Math.floor(y/2))%2==0,x*y%2+x*y%3==0,(x*y%2+x*y%3)%2==0,((x+y)%2+x*y%3)%2==0][m];if(!F[y][x]&&inv)M[y][x]=!M[y][x]}};
+  const pen=()=>{let p=0,dark=0;for(let y=0;y<N;y++){let rr=1,cr=1;for(let x=0;x<N;x++){if(M[y][x])dark++;if(x>0){if(M[y][x]==M[y][x-1]){rr++;if(rr==5)p+=3;else if(rr>5)p++}else rr=1;if(M[x][y]==M[x-1][y]){cr++;if(cr==5)p+=3;else if(cr>5)p++}else cr=1}
+    if(y>0&&x>0&&M[y][x]==M[y][x-1]&&M[y][x]==M[y-1][x]&&M[y][x]==M[y-1][x-1])p+=3}}
+    const t=N*N;p+=(Math.ceil(Math.abs(dark*20-t*10)/t)-1)*10;return p};
+  let best=0,bp=1e9;for(let m=0;m<8;m++){mk(m);fmt(m);const p=pen();if(p<bp){bp=p;best=m}mk(m)}
+  mk(best);fmt(best);return M;
+}
+function qrSvg(text){const M=qrMake(text),n=M.length+8;let d='';M.forEach((r,y)=>r.forEach((v,x)=>{if(v)d+=`M${x+4},${y+4}h1v1h-1z`}));
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n} ${n}" shape-rendering="crispEdges"><rect width="${n}" height="${n}" fill="#fff"/><path d="${d}"/></svg>`}
+
+const PAGES='https://glystv.github.io/Ultra-4k/qr.html';
+const b64=b=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const unb64=t=>Uint8Array.from(atob(t.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));
+async function qrDec(msg,key){const k=await crypto.subtle.importKey('raw',unb64(key),'AES-GCM',false,['decrypt']),b=unb64(msg);return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b.slice(0,12)},k,b.slice(12))))}
+async function qrWait(room,key,stop){
+  while(!stop.v){
+    try{const t=await(await fetch(`https://ntfy.sh/glystv-${room}/json?poll=1&since=all`)).text();
+      for(const l of t.split('\n')){if(!l.trim())continue;let j;try{j=JSON.parse(l)}catch(e){continue}if(j.event==='message'){try{return await qrDec(j.message,key)}catch(e){}}}}catch(e){}
+    await new Promise(r=>setTimeout(r,3000));
+  }
+  return null;
+}
+async function qrLogin(){
+  if(!(window.crypto&&crypto.subtle))return $('#er').textContent='El ingreso por QR no está disponible en este dispositivo.';
+  const A='abcdefghjkmnpqrstuvwxyz23456789',room=Array.from(crypto.getRandomValues(new Uint8Array(8)),x=>A[x%A.length]).join(''),key=b64(crypto.getRandomValues(new Uint8Array(16))),url=`${PAGES}#r=${room}&k=${key}`,stop={v:false};
+  $('#lg').innerHTML=`<div class="lw"><img src="logo.png"><div class="card" style="text-align:center"><div style="font-weight:700">Escanea con la cámara de tu teléfono</div><div id="qrw" data-u="${esc(url)}" style="width:min(220px,calc(50*var(--u)));margin:12px auto;border-radius:8px;overflow:hidden">${qrSvg(url)}</div><div class="mut" id="qs" style="padding:6px">Esperando los datos de tu cuenta...</div><div style="font-size:11px;color:var(--mut);word-break:break-all">${esc(PAGES)}</div><button class="b s" id="qc" style="margin-top:10px">Cancelar</button></div></div>`;
+  $('#qc').onclick=()=>{stop.v=true;login()};
+  const d=await qrWait(room,key,stop);if(!d)return;
+  const n={type:d.type=='m'?'m':'x',url:String(d.url||'').trim().replace(/\/+$/,''),user:String(d.user||'').trim(),pass:String(d.pass||''),m3u:String(d.m3u||'').trim()};
+  if(n.type=='x'&&n.url&&!/^https?:\/\//.test(n.url))n.url='http://'+n.url;
+  $('#qs').textContent='Datos recibidos. Conectando...';
+  try{C=n;await load();LS.set('conf',n);profiles()}catch(e){login('No se pudo conectar: '+(e.message||e))}
+}
+/* Control remoto (TV): enfoque con flechas y Enter */
+new MutationObserver(()=>document.querySelectorAll('.nv,.pc,.tl>div,.pf,.rg a,.ib,.pfb,.mdp,#pm div,[data-v]').forEach(e=>{if(!e.hasAttribute('tabindex'))e.tabIndex=0})).observe(document.body,{childList:true,subtree:true});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target&&e.target.matches&&e.target.matches('[tabindex]:not(button):not(input):not(select)')){e.preventDefault();e.target.click()}});
+document.addEventListener('focusin',e=>{if(e.target&&e.target.scrollIntoView)e.target.scrollIntoView({block:'nearest',inline:'nearest'})});
 C?load().then(profiles).catch(e=>login('No se pudo conectar: '+(e.message||e))):login();
 </script></body></html>
