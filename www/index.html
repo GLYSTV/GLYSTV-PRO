@@ -79,6 +79,20 @@ input,select{padding:8px;font-size:13px}button.b{padding:8px 12px;font-size:13px
 .ab{margin:6px 0 0}.dh{margin-top:4px}
 .mdp.p{height:27vh}.mdp:not(.p){height:25vh}
 #dt .rw .pc{width:46px}
+
+:root{--sat:max(env(safe-area-inset-top,0px),var(--safe-area-inset-top,0px),24px);--sar:max(env(safe-area-inset-right,0px),var(--safe-area-inset-right,0px),26px);--sal:max(env(safe-area-inset-left,0px),var(--safe-area-inset-left,0px),0px)}
+#root{padding:var(--sat) var(--sar) env(safe-area-inset-bottom,0px) var(--sal)}
+#dt{padding:var(--sat) var(--sar) 4px calc(12px + var(--sal))}
+.dh>div{min-width:0}
+.dtop h1{font-size:16px}.dtop h1 b{font-size:12px}.dtop .b{padding:4px 9px;font-size:11px}
+.ml{font-size:11.5px;margin:2px 0}.chip{font-size:10.5px;padding:0 7px}
+.mdp:not(.p){height:40vh;max-width:44vw}.mdp.p{height:36vh;max-width:30vw}
+.mdp i{width:46px;height:46px;font-size:19px}
+.ab{margin:5px 0 0}.ab button{padding:6px 11px;font-size:11.5px}
+.rg a{font-size:12px}.en{padding:4px 0}.en button{min-width:36px;height:26px;font-size:12px}
+#sx select{padding:4px 8px;font-size:11.5px}
+#dt .h{font-size:12.5px;margin:4px 0 3px}
+#dt .rw .pc{width:46px}#sg .st{display:none}#dt .pc .pn{font-size:9px;margin-top:2px}
 </style></head><body>
 <div id="lg"></div>
 <div id="root"><div id="sb"></div><div id="mn"><div id="hd"><img src="logo.png" alt="GLYSTV-PRO"><div class="sp"></div><button class="ib" data-v="search">🔍</button><div class="clk"><b id="tm"></b><small id="dy"></small></div><div class="pfb" id="pb"><div class="av" id="pa"></div><span id="pn2"></span> ▾</div></div><div id="pm"><div data-v="prof">Cambiar perfil</div><div data-v="out">Cerrar sesión</div></div><div id="ct"></div></div></div>
@@ -265,7 +279,7 @@ async function detail(it){
   }
   $('#ba').onclick=()=>go();
   const pool=(await(isS?sers():vod())).filter(x=>x.id!=it.id&&(!it.cat||x.cat==it.cat));
-  $('#sg').innerHTML=pool.sort(()=>Math.random()-.5).slice(0,15).map(card).join('');
+  $('#sg').innerHTML=pool.sort(()=>Math.random()-.5).slice(0,12).map(card).join('');
 }
 const openIt=it=>it&&(it.type!='live'&&(it.vid||it.sid)?detail(it):play(it));
 document.addEventListener('click',e=>{
