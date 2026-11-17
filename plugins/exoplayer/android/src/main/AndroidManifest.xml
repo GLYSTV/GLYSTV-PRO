@@ -7,7 +7,7 @@
             android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout|uiMode"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />
         <provider
-            android:name="androidx.core.content.FileProvider"
+            android:name="com.glystv.exo.GlystvFileProvider"
             android:authorities="${applicationId}.glystvfiles"
             android:exported="false"
             android:grantUriPermissions="true">
