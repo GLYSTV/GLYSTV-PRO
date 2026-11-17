@@ -1,5 +1,7 @@
-name: Build APK
+name: Build GLYSTV-PRO APK
 on: workflow_dispatch
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,10 +16,20 @@ jobs:
           java-version: 21
       - run: npm install
       - run: cp node_modules/hls.js/dist/hls.min.js www/hls.min.js
+      - run: |
+          echo '{"build":${{ github.run_number }}}' > www/version.json
       - run: npx cap add android
       - run: bash icons/apply.sh
+      - run: mkdir -p ~/.android && cp signing/debug.keystore ~/.android/debug.keystore
       - run: cd android && chmod +x gradlew && ./gradlew assembleDebug
+      - run: cp android/app/build/outputs/apk/debug/app-debug.apk GLYSTV-PRO.apk
       - uses: actions/upload-artifact@v4
         with:
           name: GLYSTV-PRO-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: GLYSTV-PRO.apk
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: GLYSTV-PRO build ${{ github.run_number }}
+          make_latest: true
+          files: GLYSTV-PRO.apk
