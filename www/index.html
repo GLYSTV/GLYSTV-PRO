@@ -147,10 +147,23 @@ function profiles(){
   $('#lo').onclick=()=>{localStorage.removeItem('conf');C=null;login()};
   if(!PF.length)$('#np').click();
 }
+const REPO='GLYSTV/Ultra-4k',APK=`https://github.com/${REPO}/releases/latest/download/GLYSTV-PRO.apk`;
+async function myBuild(){try{const j=await(await fetch('version.json')).json();return +j.build||0}catch(e){return 0}}
+async function checkUpdate(manual){
+  const um=$('#um');if(manual&&um)um.textContent='Buscando...';
+  try{
+    const mine=await myBuild(),r=await(await fetch(`https://api.github.com/repos/${REPO}/releases/latest`)).json();
+    const last=+((String(r.name||'').match(/(\d+)\s*$/)||[])[1]||0);if(!last)throw 0;
+    if(last>mine){
+      if(manual&&um){um.innerHTML=`Hay una versión nueva (build ${last}).<div class="row"><button class="b" id="ud">Descargar e instalar</button></div>`;$('#ud').onclick=()=>{ext(APK);toast('Descargando...')}}
+      else toast('Hay una versión nueva. Ve a Ajustes → Buscar actualización');
+    }else if(manual&&um)um.textContent='Ya tienes la última versión.';
+  }catch(e){if(manual&&um){um.innerHTML='No se pudo comprobar.<div class="row"><button class="b s" id="ud">Descargar la última versión</button></div>';$('#ud').onclick=()=>ext(APK)}}
+}
 function start(){
   $('#lg').style.display='none';$('#root').style.display='flex';
   $('#sb').innerHTML=NAV.map(n=>`<div class="nv" data-v="${n[0]}"><i>${n[1]}</i>${n[2]}</div>`).join('')+'<div class="bc">⚡ <b>GLYSTV-<span>PRO</span></b><br>Siempre contigo</div>';
-  $('#pa').textContent=P[0].toUpperCase();$('#pn2').textContent=P;go('inicio');
+  $('#pa').textContent=P[0].toUpperCase();$('#pn2').textContent=P;go('inicio');setTimeout(()=>checkUpdate(false),4000);
 }
 const favs=()=>LS.get('fav_'+P,[]),hist=()=>LS.get('his_'+P,[]);
 function togFav(it){const a=favs(),i=a.findIndex(x=>x.id==it.id);i<0?a.unshift(it):a.splice(i,1);LS.set('fav_'+P,a);return i<0}
@@ -175,7 +188,8 @@ async function go(v){
   else if(v=='hist')listView('🕘 Historial',async()=>hist());
   else if(v=='search'){ct.innerHTML=`<div class="h">🔍 Buscar</div><input id="q" placeholder="Canales, películas o series..." autofocus><div class="grid" id="gr"></div>`;const all=[...D.live,...(await vod()),...(await sers())];$('#q').oninput=e=>{const q=e.target.value.toLowerCase();$('#gr').innerHTML=q.length<2?'':all.filter(x=>x.name.toLowerCase().includes(q)).slice(0,60).map(card).join('')};$('#q').focus()}
   else if(v=='rec'||v=='guide')ct.innerHTML=`<div class="h">${v=='rec'?'⏺️ Grabaciones':'📅 Guía TV'}</div><div class="mut">Próximamente. Esta función necesita un servidor y no está disponible en esta versión.</div>`;
-  else if(v=='set')ct.innerHTML=`<div class="h">⚙️ Ajustes</div><div class="card">Perfil: <b>${esc(P)}</b><br>Cuenta: <b>${esc(C.type=='x'?C.user+' @ '+C.url:'Lista M3U')}</b><div class="row"><button class="b s" data-v="prof">Cambiar perfil</button><button class="b s" data-v="out">Cerrar sesión</button></div></div>`;
+  else if(v=='set')ct.innerHTML=`<div class="h">⚙️ Ajustes</div><div class="card">Perfil: <b>${esc(P)}</b><br>Cuenta: <b>${esc(C.type=='x'?C.user+' @ '+C.url:'Lista M3U')}</b><div class="row"><button class="b s" data-v="prof">Cambiar perfil</button><button class="b s" data-v="out">Cerrar sesión</button></div></div><div class="card" style="margin-top:10px">Actualizaciones<br><small id="uv" style="color:var(--mut)"></small><div class="row"><button class="b" id="ub">Buscar actualización</button></div><div id="um" style="margin-top:8px"></div></div>`;
+  if(v=='set'){myBuild().then(b=>{$('#uv').textContent='Versión instalada: build '+(b||'—')});$('#ub').onclick=()=>checkUpdate(true)}
   else if(v=='about')ct.innerHTML=`<div class="h">ℹ️ Acerca de</div><div class="card">GLYSTV-PRO · versión 1.0<br>Reproductor IPTV sin servidor. Tus datos se guardan solo en este dispositivo.</div>`;
 }
 async function listView(title,src,live){
