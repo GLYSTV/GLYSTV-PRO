@@ -1,0 +1,26 @@
+# Dependencias
+node_modules/
+
+# Build de Next.js
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# Secretos y configuración local (usa .env.example como plantilla)
+.env
+.env.*
+!.env.example
+
+# Grabaciones DVR y otros datos en tiempo de ejecución
+data/
+
+# Registros y temporales
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/

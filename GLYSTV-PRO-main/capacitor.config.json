@@ -1,0 +1,7 @@
+{
+  "appId": "com.glystv.pro",
+  "appName": "GLYSTV PRO",
+  "webDir": "www",
+  "server": { "androidScheme": "http", "cleartext": true },
+  "plugins": { "CapacitorHttp": { "enabled": true } }
+}

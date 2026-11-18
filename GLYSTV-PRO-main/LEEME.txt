@@ -1,0 +1,4 @@
+GLYSTV PRO (APK sin servidor)
+1) Sube este zip a GitHub y descomprimelo con el workflow Unzip.
+2) Crea .github/workflows/build-apk.yml (texto en el chat).
+3) Actions -> Build APK -> Run workflow -> descarga el APK en "Artifacts".

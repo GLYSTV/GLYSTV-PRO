@@ -1,0 +1,34 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#060d1f">
+<title>GLYSTV-PRO · Ingresar desde tu teléfono</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 70% 0,#0b1d4a,#060d1f 60%) fixed;color:#f2f5ff;font:16px system-ui,sans-serif;min-height:100vh}
+.w{max-width:480px;margin:0 auto;padding:22px}h1{text-align:center;font-size:28px;margin:18px 0 6px}h1 b{color:#2d7cff}
+p{color:#8fa0c8;text-align:center;margin:0 0 16px}.c{background:#0e1a38;border:1px solid #1c2f5e;border-radius:16px;padding:18px}
+label{display:block;font-size:13px;color:#8fa0c8;margin:12px 0 4px}input,select{width:100%;padding:13px;border-radius:12px;border:1px solid #1c2f5e;background:#0a1530;color:#f2f5ff;font-size:16px}
+button{width:100%;margin-top:18px;border:0;border-radius:12px;padding:14px;font-size:16px;font-weight:700;background:linear-gradient(90deg,#1f6bff,#2d8cff);color:#fff}button:disabled{opacity:.6}
+#m{margin-top:14px;text-align:center;min-height:20px}.ok{color:#5ee08a}.er{color:#ff7b7b}
+</style></head><body><div class="w"><h1>GLY<b>STV</b>-PRO</h1><p>Escribe los datos de tu cuenta y se enviarán a tu TV.</p>
+<div class="c" id="f"><label>Tipo de acceso</label><select id="t"><option value="x">Usuario y contraseña (Xtream)</option><option value="m">Lista M3U (enlace)</option></select>
+<div id="fx"><label>Servidor (ej: http://servidor.com:8080)</label><input id="u" autocapitalize="off" autocorrect="off">
+<label>Usuario</label><input id="us" autocapitalize="off" autocorrect="off"><label>Contraseña</label><input id="pw" type="password"></div>
+<div id="fm" style="display:none"><label>Enlace de la lista M3U</label><input id="m3" autocapitalize="off" autocorrect="off"></div>
+<button id="go">Enviar a la TV</button><div id="m"></div></div>
+<p style="margin-top:14px;font-size:12px">Los datos viajan cifrados y la clave solo está en el código QR de tu TV.</p></div>
+<script>
+const $=s=>document.querySelector(s),h=new URLSearchParams(location.hash.slice(1)),room=h.get('r')||'',key=h.get('k')||'';
+const b64=b=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const unb64=t=>Uint8Array.from(atob(t.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));
+async function enc(obj){const k=await crypto.subtle.importKey('raw',unb64(key),'AES-GCM',false,['encrypt']),iv=crypto.getRandomValues(new Uint8Array(12)),ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},k,new TextEncoder().encode(JSON.stringify(obj)))),o=new Uint8Array(12+ct.length);o.set(iv);o.set(ct,12);return b64(o)}
+const t=$('#t');t.onchange=()=>{$('#fx').style.display=t.value=='x'?'':'none';$('#fm').style.display=t.value=='m'?'':'none'};
+const msg=(x,c)=>{$('#m').textContent=x;$('#m').className=c||''};
+if(!/^[a-z0-9]{8}$/.test(room)||key.length<20){$('#go').disabled=true;msg('Abre esta página escaneando el código QR que aparece en tu TV.','er')}
+$('#go').onclick=async()=>{
+  const d={type:t.value,url:$('#u').value.trim(),user:$('#us').value.trim(),pass:$('#pw').value,m3u:$('#m3').value.trim()};
+  if(d.type=='x'&&(!d.url||!d.user||!d.pass))return msg('Completa servidor, usuario y contraseña.','er');
+  if(d.type=='m'&&!d.m3u)return msg('Pega el enlace de la lista.','er');
+  $('#go').disabled=true;msg('Enviando...');
+  try{const r=await fetch('https://ntfy.sh/glystv-'+room,{method:'POST',body:await enc(d)});if(!r.ok)throw 0;msg('Listo. Mira tu TV: ya se está conectando.','ok')}
+  catch(e){msg('No se pudo enviar. Revisa tu internet e inténtalo de nuevo.','er');$('#go').disabled=false}
+};
+</script></body></html>
