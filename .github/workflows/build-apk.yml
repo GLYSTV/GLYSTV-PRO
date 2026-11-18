@@ -28,7 +28,23 @@ jobs:
           sed -i -E "s/versionName \"[^\"]*\"/versionName \"$VER\"/" android/app/build.gradle
           grep -n versionCode android/app/build.gradle
       - run: bash icons/apply.sh
-      - run: mkdir -p ~/.android && cp signing/debug.keystore ~/.android/debug.keystore
+      - name: Firmar siempre con la misma llave
+        run: |
+          mkdir -p ~/.android && cp signing/debug.keystore ~/.android/debug.keystore
+          cat >> android/app/build.gradle <<EOF
+
+          android {
+              signingConfigs {
+                  debug {
+                      storeFile file("$GITHUB_WORKSPACE/signing/debug.keystore")
+                      storePassword "android"
+                      keyAlias "androiddebugkey"
+                      keyPassword "android"
+                  }
+              }
+          }
+          EOF
+          tail -12 android/app/build.gradle
       - run: cd android && chmod +x gradlew && ./gradlew assembleDebug
       - run: cp android/app/build/outputs/apk/debug/app-debug.apk GLYSTV-PRO.apk
       - name: Verificar firma (debe ser siempre la misma)
@@ -49,3 +65,5 @@ jobs:
           name: GLYSTV-PRO v${{ env.VER }} build ${{ github.run_number }}
           make_latest: true
           files: GLYSTV-PRO.apk
+
+          
