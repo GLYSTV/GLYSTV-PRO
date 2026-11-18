@@ -224,7 +224,7 @@ async function go(v){
   else if(v=='rec'||v=='guide')ct.innerHTML=`<div class="h">${v=='rec'?'⏺️ Grabaciones':'📅 Guía TV'}</div><div class="mut">Próximamente. Esta función necesita un servidor y no está disponible en esta versión.</div>`;
   else if(v=='set')ct.innerHTML=`<div class="h">⚙️ Ajustes</div><div class="card">Perfil: <b>${esc(P)}</b><br>Cuenta: <b>${esc(C.type=='x'?C.user+' @ '+C.url:'Lista M3U')}</b><div class="row"><button class="b s" data-v="prof">Cambiar perfil</button><button class="b s" data-v="out">Cerrar sesión</button></div></div><div class="card" style="margin-top:10px">Actualizaciones<br><small id="uv" style="color:var(--mut)"></small><div class="row"><button class="b" id="ub">Buscar actualización</button></div><div id="um" style="margin-top:8px"></div></div>`;
   if(v=='set'){myBuild().then(b=>{$('#uv').textContent='Versión instalada: build '+(b||'—')});$('#ub').onclick=()=>checkUpdate(true)}
-  else if(v=='about')ct.innerHTML=`<div class="h">ℹ️ Acerca de</div><div class="card">GLYSTV-PRO · versión 1.0<br>Reproductor IPTV sin servidor. Tus datos se guardan solo en este dispositivo.</div>`;
+  else if(v=='about')ct.innerHTML=`<div class="h">ℹ️ Acerca de</div><div class="card">GLYSTV-PRO · versión 1.1<br>Reproductor IPTV sin servidor. Tus datos se guardan solo en este dispositivo.</div>`;
 }
 // Categoría que se abre sola al entrar en Películas (sin tildes/mayúsculas): "Recién añadidas", "Recently added"...
 const RECENT_RE=/(recien\s*(anadid|agregad|incorporad)|recently\s*added|latest\s*added|newly\s*added|ultimas?\s*anadid|nuevas?\s*anadid)/;
