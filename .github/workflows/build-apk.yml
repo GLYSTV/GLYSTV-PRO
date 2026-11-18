@@ -49,5 +49,3 @@ jobs:
           name: GLYSTV-PRO v${{ env.VER }} build ${{ github.run_number }}
           make_latest: true
           files: GLYSTV-PRO.apk
-
-          
