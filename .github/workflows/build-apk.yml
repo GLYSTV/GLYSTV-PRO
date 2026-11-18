@@ -19,6 +19,9 @@ jobs:
       - run: |
           echo '{"build":${{ github.run_number }}}' > www/version.json
       - run: npx cap add android
+      - run: |
+          sed -i -E "s/versionCode [0-9]+/versionCode ${{ github.run_number }}/" android/app/build.gradle
+          grep -n versionCode android/app/build.gradle
       - run: bash icons/apply.sh
       - run: mkdir -p ~/.android && cp signing/debug.keystore ~/.android/debug.keystore
       - run: cd android && chmod +x gradlew && ./gradlew assembleDebug
@@ -33,3 +36,4 @@ jobs:
           name: GLYSTV-PRO build ${{ github.run_number }}
           make_latest: true
           files: GLYSTV-PRO.apk
+          
