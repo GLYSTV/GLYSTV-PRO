@@ -166,7 +166,7 @@ function profiles(){
   $('#lo').onclick=()=>{localStorage.removeItem('conf');C=null;login()};
   if(!PF.length)$('#np').click();
 }
-const REPO='GLYSTV/Ultra-4k',APK=`https://github.com/${REPO}/releases/latest/download/GLYSTV-PRO.apk`;
+const REPO='GLYSTV/GLYSTV-PRO',APK=`https://github.com/${REPO}/releases/latest/download/GLYSTV-PRO.apk`;
 async function myBuild(){try{const j=await(await fetch('version.json')).json();return +j.build||0}catch(e){return 0}}
 async function checkUpdate(manual){
   const um=$('#um');if(manual&&um)um.textContent='Buscando...';
@@ -340,7 +340,7 @@ function qrMake(text){
 function qrSvg(text){const M=qrMake(text),n=M.length+8;let d='';M.forEach((r,y)=>r.forEach((v,x)=>{if(v)d+=`M${x+4},${y+4}h1v1h-1z`}));
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n} ${n}" shape-rendering="crispEdges"><rect width="${n}" height="${n}" fill="#fff"/><path d="${d}"/></svg>`}
 
-const PAGES='https://glystv.github.io/Ultra-4k/qr.html';
+const PAGES='https://glystv.github.io/GLYSTV-PRO/qr.html';
 const b64=b=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 const unb64=t=>Uint8Array.from(atob(t.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));
 async function qrDec(msg,key){const k=await crypto.subtle.importKey('raw',unb64(key),'AES-GCM',false,['decrypt']),b=unb64(msg);return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b.slice(0,12)},k,b.slice(12))))}
