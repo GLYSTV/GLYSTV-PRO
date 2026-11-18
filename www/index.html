@@ -96,6 +96,7 @@ input,select{padding:8px;font-size:13px}button.b{padding:8px 12px;font-size:13px
 
 .nv:focus,.cat:focus,.pc:focus,.tl>div:focus,.pf:focus,.rg a:focus,.ib:focus,.pfb:focus,.mdp:focus,#pm div:focus,button:focus,select:focus,input:focus{outline:3px solid #6fd0ff;outline-offset:2px;border-radius:8px}
 .st{display:none!important}
+.pww{position:relative}.pww input{padding-right:46px}.pww .eye{position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--tx);font-size:18px;padding:6px 10px;border-radius:10px}
 #ct.lvm{display:flex;flex-direction:column;overflow:hidden}
 .lv{flex:1;min-height:0;display:flex;gap:10px;margin-top:8px}
 .cl{flex:none;width:150px;overflow:auto;display:flex;flex-direction:column;gap:3px;padding-right:6px;border-right:1px solid var(--line)}
@@ -131,10 +132,10 @@ function login(err){
   $('#lg').style.display='block';$('#lg').innerHTML=`<div class="lw"><img src="logo.png"><div class="card">
   <label>Tipo de acceso</label><select id="t"><option value="x">Usuario y contraseña (Xtream)</option><option value="m">Lista M3U (enlace)</option></select>
   <div id="fx"><label>Servidor (ej: http://servidor.com:8080)</label><input id="u" value="${esc(c.url||'')}" autocapitalize="off">
-  <label>Usuario</label><input id="us" value="${esc(c.user||'')}" autocapitalize="off"><label>Contraseña</label><input id="pw" type="password" value="${esc(c.pass||'')}"></div>
+  <label>Usuario</label><input id="us" value="${esc(c.user||'')}" autocapitalize="off"><label>Contraseña</label><div class="pww"><input id="pw" type="password" value="${esc(c.pass||'')}"><button type="button" class="eye" id="eye" aria-label="Mostrar contraseña">👁</button></div></div>
   <div id="fm" style="display:none"><label>Enlace de la lista M3U</label><input id="m" value="${esc(c.m3u||'')}" autocapitalize="off"></div>
   <button class="b" id="go" style="width:100%;margin-top:18px">Entrar</button><button class="b s" id="qrb" style="width:100%;margin-top:10px">📱 Ingresar con QR (desde tu teléfono)</button><div class="err" id="er">${esc(err||'')}</div></div></div>`;
-  $('#qrb').onclick=qrLogin;const t=$('#t');t.value=c.type||'x';const sw=()=>{$('#fx').style.display=t.value=='x'?'':'none';$('#fm').style.display=t.value=='m'?'':'none'};sw();t.onchange=sw;
+  $('#qrb').onclick=qrLogin;$('#eye').onclick=()=>{const i=$('#pw'),h=i.type=='password';i.type=h?'text':'password';$('#eye').textContent=h?'🙈':'👁';$('#eye').setAttribute('aria-label',h?'Ocultar contraseña':'Mostrar contraseña')};const t=$('#t');t.value=c.type||'x';const sw=()=>{$('#fx').style.display=t.value=='x'?'':'none';$('#fm').style.display=t.value=='m'?'':'none'};sw();t.onchange=sw;
   $('#go').onclick=async()=>{
     const n={type:t.value,url:$('#u').value.trim().replace(/\/+$/,''),user:$('#us').value.trim(),pass:$('#pw').value,m3u:$('#m').value.trim()};
     if(n.type=='x'&&(!n.url||!n.user||!n.pass))return $('#er').textContent='Completa servidor, usuario y contraseña.';
@@ -163,6 +164,9 @@ async function load(){
   }
   if(!D.live.length)throw new Error('la lista no tiene canales');
 }
+const catList=a=>Array.isArray(a)?a.map(x=>({id:String(x.category_id),name:x.category_name})):[];
+async function vcats(){if(!D.vcats)D.vcats=await api('get_vod_categories').then(catList).catch(()=>[]);return D.vcats}
+async function scats(){if(!D.scats)D.scats=await api('get_series_categories').then(catList).catch(()=>[]);return D.scats}
 async function vod(){if(!D.vod)D.vod=await api('get_vod_streams').then(a=>Array.isArray(a)?a.map(x=>({id:'v'+x.stream_id,vid:x.stream_id,cat:String(x.category_id),name:x.name,logo:x.stream_icon,type:'movie',added:+x.added||0,url:`${C.url}/movie/${enc(C.user)}/${enc(C.pass)}/${x.stream_id}.${x.container_extension||'mp4'}`})).sort((a,b)=>b.added-a.added):[]).catch(()=>[]);return D.vod}
 async function sers(){if(!D.series)D.series=await api('get_series').then(a=>Array.isArray(a)?a.map(x=>({id:'s'+x.series_id,cat:String(x.category_id),name:x.name,logo:x.cover,type:'series',sid:x.series_id,added:+x.last_modified||0})).sort((a,b)=>b.added-a.added):[]).catch(()=>[]);return D.series}
 
@@ -177,6 +181,7 @@ function profiles(){
   if(!PF.length)$('#np').click();
 }
 const REPO='GLYSTV/GLYSTV-PRO',APK=`https://github.com/${REPO}/releases/latest/download/GLYSTV-PRO.apk`;
+const openUrl=u=>{const x=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.ExoPlayer;if(x&&x.openUrl)return x.openUrl({url:u}).catch(()=>{try{window.open(u,'_system')}catch(e){location.href=u}});try{window.open(u,'_system')}catch(e){location.href=u}};
 async function myBuild(){try{const j=await(await fetch('version.json')).json();return +j.build||0}catch(e){return 0}}
 async function checkUpdate(manual){
   const um=$('#um');if(manual&&um)um.textContent='Buscando...';
@@ -184,10 +189,10 @@ async function checkUpdate(manual){
     const mine=await myBuild(),r=await(await fetch(`https://api.github.com/repos/${REPO}/releases/latest`)).json();
     const last=+((String(r.name||'').match(/(\d+)\s*$/)||[])[1]||0);if(!last)throw 0;
     if(last>mine){
-      if(manual&&um){um.innerHTML=`Hay una versión nueva (build ${last}).<div class="row"><button class="b" id="ud">Descargar e instalar</button></div>`;$('#ud').onclick=()=>{ext(APK);toast('Descargando...')}}
+      if(manual&&um){um.innerHTML=`Hay una versión nueva (build ${last}).<div class="row"><button class="b" id="ud">Descargar e instalar</button></div>`;$('#ud').onclick=()=>{openUrl(APK);toast('Abriendo la descarga en tu navegador...')}}
       else toast('Hay una versión nueva. Ve a Ajustes → Buscar actualización');
     }else if(manual&&um)um.textContent='Ya tienes la última versión.';
-  }catch(e){if(manual&&um){um.innerHTML='No se pudo comprobar.<div class="row"><button class="b s" id="ud">Descargar la última versión</button></div>';$('#ud').onclick=()=>ext(APK)}}
+  }catch(e){if(manual&&um){um.innerHTML='No se pudo comprobar.<div class="row"><button class="b s" id="ud">Descargar la última versión</button></div>';$('#ud').onclick=()=>openUrl(APK)}}
 }
 function start(){
   $('#lg').style.display='none';$('#root').style.display='flex';
@@ -210,9 +215,9 @@ async function go(v){
     let bi=0;const mv=d=>{bi=(bi+d+BN.length)%BN.length;$('#bi').src=BN[bi];document.querySelectorAll('.dots s').forEach((s,i)=>s.classList.toggle('on',i==bi))};
     $('#bl').onclick=()=>mv(-1);$('#br').onclick=()=>mv(1);
     vod().then(a=>{if(S.v=='inicio')$('#r1').innerHTML=row('Películas','🎬',a,'movies')});sers().then(a=>{if(S.v=='inicio')$('#r2').innerHTML=row('Series','📺',a,'series')});
-  }else if(v=='live')listView('📺 TV en Vivo',async()=>D.live,true);
-  else if(v=='movies')listView('🎬 Películas',vod);
-  else if(v=='series')listView('🎞️ Series',sers);
+  }else if(v=='live')listView('📺 TV en Vivo',async()=>D.live,async()=>D.cats);
+  else if(v=='movies')listView('🎬 Películas',vod,vcats);
+  else if(v=='series')listView('🎞️ Series',sers,scats);
   else if(v=='favs')listView('⭐ Favoritos',async()=>favs());
   else if(v=='hist')listView('🕘 Historial',async()=>hist());
   else if(v=='search'){ct.innerHTML=`<div class="h">🔍 Buscar</div><input id="q" placeholder="Canales, películas o series..." autofocus><div class="grid" id="gr"></div>`;const all=[...D.live,...(await vod()),...(await sers())];$('#q').oninput=e=>{const q=e.target.value.toLowerCase();$('#gr').innerHTML=q.length<2?'':all.filter(x=>x.name.toLowerCase().includes(q)).slice(0,60).map(card).join('')};$('#q').focus()}
@@ -221,14 +226,15 @@ async function go(v){
   if(v=='set'){myBuild().then(b=>{$('#uv').textContent='Versión instalada: build '+(b||'—')});$('#ub').onclick=()=>checkUpdate(true)}
   else if(v=='about')ct.innerHTML=`<div class="h">ℹ️ Acerca de</div><div class="card">GLYSTV-PRO · versión 1.0<br>Reproductor IPTV sin servidor. Tus datos se guardan solo en este dispositivo.</div>`;
 }
-async function listView(title,src,live){
-  const all=await src();
-  const cnt={};if(live)all.forEach(x=>cnt[x.cat]=(cnt[x.cat]||0)+1);
+async function listView(title,src,catsFn){
+  const tok=S,all=await src(),cats=catsFn?await catsFn():[];if(S!==tok)return;
+  const cnt={};all.forEach(x=>cnt[x.cat]=(cnt[x.cat]||0)+1);
+  const shown=cats.filter(c=>cnt[c.id]),live=shown.length>0;
   $('#ct').classList.toggle('lvm',!!live);
   $('#ct').innerHTML=live
-    ?`<div class="h">${title}</div><div class="row"><input id="q" placeholder="Buscar..."></div><div class="lv"><div class="cl" id="cl"><div class="cat on" data-c="">📁 Todas las categorías<small>${all.length}</small></div>${D.cats.filter(c=>cnt[c.id]).map(c=>`<div class="cat" data-c="${esc(c.id)}">📁 ${esc(c.name)}<small>${cnt[c.id]}</small></div>`).join('')}</div><div class="gw"><div class="grid" id="gr"></div><div class="mut" id="mr"></div></div></div>`
+    ?`<div class="h">${title}</div><div class="row"><input id="q" placeholder="Buscar..."></div><div class="lv"><div class="cl" id="cl"><div class="cat on" data-c="">📁 Todas las categorías<small>${all.length}</small></div>${shown.map(c=>`<div class="cat" data-c="${esc(c.id)}">📁 ${esc(c.name)}<small>${cnt[c.id]}</small></div>`).join('')}</div><div class="gw"><div class="grid" id="gr"></div><div class="mut" id="mr"></div></div></div>`
     :`<div class="h">${title}</div><div class="row"><input id="q" placeholder="Buscar..."></div><div class="grid" id="gr"></div><div class="mut" id="mr"></div>`;
-  const cn={};D.cats.forEach(c=>cn[c.id]=c.name);
+  const cn={};cats.forEach(c=>cn[c.id]=c.name);
   const draw=()=>{const r=all.filter(x=>(!S.cat||x.cat==S.cat)&&(!S.q||x.name.toLowerCase().includes(S.q))&&(!S.kw||S.kw.test(cn[x.cat]||'')||S.kw.test(x.name)));
     $('#gr').innerHTML=r.slice(0,S.lim).map(card).join('');$('#mr').innerHTML=r.length>S.lim?'<button class="b s" id="mm">Ver más</button>':(r.length?'':'No hay elementos.');
     if($('#mm'))$('#mm').onclick=()=>{S.lim+=60;draw()};
