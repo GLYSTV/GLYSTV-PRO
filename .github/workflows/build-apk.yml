@@ -15,17 +15,30 @@ jobs:
           distribution: temurin
           java-version: 21
       - run: npm install
+      - run: echo "VER=$(tr -d ' \r\n' < VERSION)" >> $GITHUB_ENV
       - run: cp node_modules/hls.js/dist/hls.min.js www/hls.min.js
       - run: |
-          echo '{"build":${{ github.run_number }}}' > www/version.json
+          VER=$(tr -d ' \r\n' < VERSION)
+          echo "{\"build\":${{ github.run_number }},\"name\":\"$VER\"}" > www/version.json
+          cat www/version.json
       - run: npx cap add android
       - run: |
           sed -i -E "s/versionCode [0-9]+/versionCode ${{ github.run_number }}/" android/app/build.gradle
+          VER=$(tr -d ' \r\n' < VERSION)
+          sed -i -E "s/versionName \"[^\"]*\"/versionName \"$VER\"/" android/app/build.gradle
           grep -n versionCode android/app/build.gradle
       - run: bash icons/apply.sh
       - run: mkdir -p ~/.android && cp signing/debug.keystore ~/.android/debug.keystore
       - run: cd android && chmod +x gradlew && ./gradlew assembleDebug
       - run: cp android/app/build/outputs/apk/debug/app-debug.apk GLYSTV-PRO.apk
+      - name: Verificar firma (debe ser siempre la misma)
+        run: |
+          APKSIGNER=$(ls $ANDROID_HOME/build-tools/*/apksigner | tail -1)
+          GOT=$($APKSIGNER verify --print-certs GLYSTV-PRO.apk | grep "SHA-256" | head -1 | sed 's/.*: //')
+          WANT=$(keytool -list -keystore signing/debug.keystore -storepass android | grep "SHA-256" | sed 's/.*: //' | tr -d ':' | tr 'A-F' 'a-f')
+          echo "Firma del APK:  $GOT"
+          echo "Firma esperada: $WANT"
+          [ "$GOT" = "$WANT" ] || { echo "LA FIRMA NO COINCIDE"; exit 1; }
       - uses: actions/upload-artifact@v4
         with:
           name: GLYSTV-PRO-apk
@@ -33,7 +46,8 @@ jobs:
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: latest
-          name: GLYSTV-PRO build ${{ github.run_number }}
+          name: GLYSTV-PRO v${{ env.VER }} build ${{ github.run_number }}
           make_latest: true
           files: GLYSTV-PRO.apk
+
           
