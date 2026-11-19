@@ -6,7 +6,13 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.StateListDrawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.KeyEvent;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
@@ -39,6 +45,17 @@ public class PlayerActivity extends Activity {
     private String alt;
     private boolean triedAlt = false;
     private int zoom = 0;
+    private static final int HIDE_MS = 4000;
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Runnable autoHide = new Runnable() {
+        @Override public void run() {
+            // Solo se oculta mientras se reproduce; en pausa los controles se quedan visibles
+            if (player != null && player.isPlaying()) {
+                view.hideController();
+                bar.setVisibility(View.GONE);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle b) {
@@ -54,6 +71,8 @@ public class PlayerActivity extends Activity {
         view.setShowNextButton(false);
         view.setShowRewindButton(false);
         view.setShowFastForwardButton(false);
+        view.setControllerShowTimeoutMs(HIDE_MS);
+        view.setControllerHideOnTouch(true);
         root.addView(view, new FrameLayout.LayoutParams(-1, -1));
 
         bar = new LinearLayout(this);
@@ -77,6 +96,12 @@ public class PlayerActivity extends Activity {
             @Override
             public void onVisibilityChanged(int visibility) {
                 bar.setVisibility(visibility);
+                if (visibility == View.VISIBLE) {
+                    noHighlight(view);
+                    scheduleHide();
+                } else {
+                    handler.removeCallbacks(autoHide);
+                }
             }
         });
 
@@ -111,7 +136,34 @@ public class PlayerActivity extends Activity {
         player.setMediaItem(MediaItem.fromUri(url));
         player.prepare();
         player.setPlayWhenReady(true);
+        noHighlight(view);
         view.showController();
+        scheduleHide();
+    }
+
+    private void scheduleHide() {
+        handler.removeCallbacks(autoHide);
+        handler.postDelayed(autoHide, HIDE_MS + 500);
+    }
+
+    // Quita el cuadro de foco (verde) de los botones propios del reproductor
+    private void noHighlight(View v) {
+        if (v == bar) return; // los botones Zoom/Subtítulos/Audio conservan su resalte azul
+        if (Build.VERSION.SDK_INT >= 26) v.setDefaultFocusHighlightEnabled(false);
+        if (v instanceof ImageView) {
+            v.setBackground(null);
+            v.setForeground(null);
+        }
+        if (v instanceof ViewGroup) {
+            ViewGroup g = (ViewGroup) v;
+            for (int i = 0; i < g.getChildCount(); i++) noHighlight(g.getChildAt(i));
+        }
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent e) {
+        if (e.getAction() == KeyEvent.ACTION_DOWN && bar != null && bar.getVisibility() == View.VISIBLE) scheduleHide();
+        return super.dispatchKeyEvent(e);
     }
 
     private int dp(int v) {
@@ -224,6 +276,7 @@ public class PlayerActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        handler.removeCallbacks(autoHide);
         if (player != null) {
             player.release();
             player = null;

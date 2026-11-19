@@ -165,12 +165,34 @@ async function load(){
     D.cats=[...cats].map(x=>({id:x,name:x}));
   }
   if(!D.live.length)throw new Error('la lista no tiene canales');
+  D.rawLive=D.live;D.rawCats=D.cats;applyAdultLive();
 }
 const catList=a=>Array.isArray(a)?a.map(x=>({id:String(x.category_id),name:x.category_name})):[];
-async function vcats(){if(!D.vcats)D.vcats=await api('get_vod_categories').then(catList).catch(()=>[]);return D.vcats}
-async function scats(){if(!D.scats)D.scats=await api('get_series_categories').then(catList).catch(()=>[]);return D.scats}
-async function vod(){if(!D.vod)D.vod=await api('get_vod_streams').then(a=>Array.isArray(a)?a.map(x=>({id:'v'+x.stream_id,vid:x.stream_id,cat:String(x.category_id),name:x.name,logo:x.stream_icon,type:'movie',added:+x.added||0,url:`${C.url}/movie/${enc(C.user)}/${enc(C.pass)}/${x.stream_id}.${x.container_extension||'mp4'}`})).sort((a,b)=>b.added-a.added):[]).catch(()=>[]);return D.vod}
-async function sers(){if(!D.series)D.series=await api('get_series').then(a=>Array.isArray(a)?a.map(x=>({id:'s'+x.series_id,cat:String(x.category_id),name:x.name,logo:x.cover,type:'series',sid:x.series_id,added:+x.last_modified||0})).sort((a,b)=>b.added-a.added):[]).catch(()=>[]);return D.series}
+async function vcatsRaw(){if(!D.vcats)D.vcats=await api('get_vod_categories').then(catList).catch(()=>[]);return D.vcats}
+async function scatsRaw(){if(!D.scats)D.scats=await api('get_series_categories').then(catList).catch(()=>[]);return D.scats}
+// ---- Contenido para adultos (se oculta por perfil desde Ajustes) ----
+const AD_CAT=/(^|[^a-z0-9])(xxx|porn\w*|adult\w*|er[oó]tic\w*|sex(o|y)?|hentai|playboy|hardcore|nsfw|\+\s?18|18\s?\+|para adultos)([^a-z0-9]|$)/i;
+const AD_ITEM=/(^|[^a-z0-9])(xxx|porn\w*|hentai|nsfw)([^a-z0-9]|$)/i;
+const adultOn=()=>!!LS.get('adult_'+P,false);
+const adSet=cs=>new Set((cs||[]).filter(c=>AD_CAT.test(c.name)).map(c=>c.id));
+const adOk=(x,set)=>!set.has(x.cat)&&!AD_ITEM.test(x.name);
+function applyAdultLive(){
+  if(!D.rawLive)return;
+  const on=adultOn(),st=adSet(D.rawCats);
+  D.live=on?D.rawLive.filter(x=>adOk(x,st)):D.rawLive;
+  D.cats=on?D.rawCats.filter(c=>!AD_CAT.test(c.name)):D.rawCats;
+}
+async function vod(){const on=adultOn(),a=await vodRaw();if(!on)return a;if(D._fv&&D._fvP===P)return D._fv;const st=adSet(await vcatsRaw());D._fvP=P;return D._fv=a.filter(x=>adOk(x,st))}
+async function sers(){const on=adultOn(),a=await sersRaw();if(!on)return a;if(D._fs&&D._fsP===P)return D._fs;const st=adSet(await scatsRaw());D._fsP=P;return D._fs=a.filter(x=>adOk(x,st))}
+async function vcats(){const c=await vcatsRaw();return adultOn()?c.filter(x=>!AD_CAT.test(x.name)):c}
+async function scats(){const c=await scatsRaw();return adultOn()?c.filter(x=>!AD_CAT.test(x.name)):c}
+async function visFav(a){
+  if(!adultOn())return a;
+  const L=adSet(D.rawCats),V=adSet(await vcatsRaw()),E=adSet(await scatsRaw());
+  return a.filter(x=>adOk(x,{live:L,movie:V,series:E}[x.type]||new Set()));
+}
+async function vodRaw(){if(!D.vod)D.vod=await api('get_vod_streams').then(a=>Array.isArray(a)?a.map(x=>({id:'v'+x.stream_id,vid:x.stream_id,cat:String(x.category_id),name:x.name,logo:x.stream_icon,type:'movie',added:+x.added||0,url:`${C.url}/movie/${enc(C.user)}/${enc(C.pass)}/${x.stream_id}.${x.container_extension||'mp4'}`})).sort((a,b)=>b.added-a.added):[]).catch(()=>[]);return D.vod}
+async function sersRaw(){if(!D.series)D.series=await api('get_series').then(a=>Array.isArray(a)?a.map(x=>({id:'s'+x.series_id,cat:String(x.category_id),name:x.name,logo:x.cover,type:'series',sid:x.series_id,added:+x.last_modified||0})).sort((a,b)=>b.added-a.added):[]).catch(()=>[]);return D.series}
 
 function profiles(){
   $('#root').style.display='none';$('#lg').style.display='block';
@@ -200,7 +222,7 @@ async function checkUpdate(manual){
 function start(){
   $('#lg').style.display='none';$('#root').style.display='flex';
   $('#sb').innerHTML=NAV.map(n=>`<div class="nv" data-v="${n[0]}"><i>${n[1]}</i>${n[2]}</div>`).join('')+'<div class="bc">⚡ <b>GLYSTV-<span>PRO</span></b><br>Siempre contigo</div>';
-  $('#pa').textContent=P[0].toUpperCase();$('#pn2').textContent=P;go('inicio');setTimeout(()=>checkUpdate(false),4000);
+  $('#pa').textContent=P[0].toUpperCase();$('#pn2').textContent=P;D._fv=D._fs=null;applyAdultLive();go('inicio');setTimeout(()=>checkUpdate(false),4000);
 }
 const favs=()=>LS.get('fav_'+P,[]),hist=()=>LS.get('his_'+P,[]);
 function togFav(it){const a=favs(),i=a.findIndex(x=>x.id==it.id);i<0?a.unshift(it):a.splice(i,1);LS.set('fav_'+P,a);return i<0}
@@ -221,12 +243,12 @@ async function go(v){
   }else if(v=='live')listView('📺 TV en Vivo',async()=>D.live,async()=>D.cats);
   else if(v=='movies')listView('🎬 Películas',vod,vcats,RECENT_RE);
   else if(v=='series')listView('🎞️ Series',sers,scats);
-  else if(v=='favs')listView('⭐ Favoritos',async()=>favs());
-  else if(v=='hist')listView('🕘 Historial',async()=>hist());
+  else if(v=='favs')listView('⭐ Favoritos',async()=>visFav(favs()));
+  else if(v=='hist')listView('🕘 Historial',async()=>visFav(hist()));
   else if(v=='search'){ct.innerHTML=`<div class="h">🔍 Buscar</div><input id="q" placeholder="Canales, películas o series..." autofocus><div class="grid" id="gr"></div>`;const all=[...D.live,...(await vod()),...(await sers())];$('#q').oninput=e=>{const q=e.target.value.toLowerCase();$('#gr').innerHTML=q.length<2?'':all.filter(x=>x.name.toLowerCase().includes(q)).slice(0,60).map(card).join('')};$('#q').focus()}
   else if(v=='rec'||v=='guide')ct.innerHTML=`<div class="h">${v=='rec'?'⏺️ Grabaciones':'📅 Guía TV'}</div><div class="mut">Próximamente. Esta función necesita un servidor y no está disponible en esta versión.</div>`;
-  else if(v=='set')ct.innerHTML=`<div class="h">⚙️ Ajustes</div><div class="card">Perfil: <b>${esc(P)}</b><br>Cuenta: <b>${esc(C.type=='x'?C.user+' @ '+C.url:'Lista M3U')}</b><div class="row"><button class="b s" data-v="prof">Cambiar perfil</button><button class="b s" data-v="out">Cerrar sesión</button></div></div><div class="card" style="margin-top:10px">Actualizaciones<br><small id="uv" style="color:var(--mut)"></small><div class="row"><button class="b" id="ub">Buscar actualización</button></div><div id="um" style="margin-top:8px"></div></div>`;
-  if(v=='set'){myInfo().then(j=>{$('#uv').textContent='Versión instalada: '+(j.name?'v'+j.name+' · ':'')+'build '+(j.build||'—')});$('#ub').onclick=()=>checkUpdate(true)}
+  else if(v=='set')ct.innerHTML=`<div class="h">⚙️ Ajustes</div><div class="card">Perfil: <b>${esc(P)}</b><br>Cuenta: <b>${esc(C.type=='x'?C.user+' @ '+C.url:'Lista M3U')}</b><div class="row"><button class="b s" data-v="prof">Cambiar perfil</button><button class="b s" data-v="out">Cerrar sesión</button></div></div><div class="card" style="margin-top:10px">🔞 Contenido para adultos<br><small style="color:var(--mut)">Oculta categorías y títulos para adultos (XXX, +18, erótico...) en este perfil.</small><div class="row"><button class="b" id="ad"></button></div></div><div class="card" style="margin-top:10px">Actualizaciones<br><small id="uv" style="color:var(--mut)"></small><div class="row"><button class="b" id="ub">Buscar actualización</button></div><div id="um" style="margin-top:8px"></div></div>`;
+  if(v=='set'){const adb=()=>{$('#ad').textContent=adultOn()?'🔒 Ocultos · tocar para mostrar':'🔓 Visibles · tocar para ocultar'};adb();$('#ad').onclick=()=>{LS.set('adult_'+P,!adultOn());D._fv=D._fs=null;applyAdultLive();adb();toast(adultOn()?'Contenido para adultos oculto':'Contenido para adultos visible')};myInfo().then(j=>{$('#uv').textContent='Versión instalada: '+(j.name?'v'+j.name+' · ':'')+'build '+(j.build||'—')});$('#ub').onclick=()=>checkUpdate(true)}
   else if(v=='about')ct.innerHTML=`<div class="h">ℹ️ Acerca de</div><div class="card">GLYSTV-PRO · versión 1.1<br>Reproductor IPTV sin servidor. Tus datos se guardan solo en este dispositivo.</div>`;
 }
 // Categoría que se abre sola al entrar en Películas (sin tildes/mayúsculas): "Recién añadidas", "Recently added"...
