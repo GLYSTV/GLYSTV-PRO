@@ -96,6 +96,7 @@ input,select{padding:8px;font-size:13px}button.b{padding:8px 12px;font-size:13px
 
 .nv:focus,.cat:focus,.pc:focus,.tl>div:focus,.pf:focus,.rg a:focus,.ib:focus,.pfb:focus,.mdp:focus,#pm div:focus,button:focus,select:focus,input:focus{outline:3px solid #6fd0ff;outline-offset:2px;border-radius:8px}
 .st{display:none!important}
+.mdp.pos img{object-fit:contain}
 .pww{position:relative}.pww input{padding-right:46px}.pww .eye{position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--tx);font-size:18px;padding:6px 10px;border-radius:10px}
 #ct.lvm{display:flex;flex-direction:column;overflow:hidden}
 .lv{flex:1;min-height:0;display:flex;gap:10px;margin-top:8px}
@@ -103,7 +104,7 @@ input,select{padding:8px;font-size:13px}button.b{padding:8px 12px;font-size:13px
 .cat{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:7px 9px;border-radius:10px;font-size:12px;cursor:pointer;border:1px solid transparent;line-height:1.2}
 .cat small{color:var(--mut);font-size:10px;flex:none}
 .cat.on{background:linear-gradient(90deg,#1f6bff,#2d8cff);border-color:#6fb0ff;font-weight:700}.cat.on small{color:#fff}
-.gw{flex:1;min-width:0;overflow:auto}.gw .grid{margin-top:0}
+.gw{flex:1;min-width:0;display:flex;flex-direction:column}.gw .row{flex:none;margin-top:0}.gs{flex:1;min-height:0;overflow:auto;padding-top:4px}.gs .grid{margin-top:0}
 .qrl{display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:center;text-align:left}
 .qrl .qa{flex:none}.qrl .qb{flex:1 1 200px;min-width:0;text-align:center}.qrl .qb img{max-width:170px;margin:0 auto 10px}
 .tv .mdp:not(.p){height:calc(44*var(--u));max-width:calc(42*var(--w))}.tv .mdp.p{height:calc(42*var(--u));max-width:calc(30*var(--w))}
@@ -238,7 +239,7 @@ async function listView(title,src,catsFn,defRe){
   if(defRe&&live&&!S.cat){const dc=shown.find(c=>defRe.test(norm(c.name)));if(dc)S.cat=dc.id}
   $('#ct').classList.toggle('lvm',!!live);
   $('#ct').innerHTML=live
-    ?`<div class="h">${title}</div><div class="row"><input id="q" placeholder="Buscar..."></div><div class="lv"><div class="cl" id="cl"><div class="cat on" data-c="">📁 Todas las categorías<small>${all.length}</small></div>${shown.map(c=>`<div class="cat" data-c="${esc(c.id)}">📁 ${esc(c.name)}<small>${cnt[c.id]}</small></div>`).join('')}</div><div class="gw"><div class="grid" id="gr"></div><div class="mut" id="mr"></div></div></div>`
+    ?`<div class="h">${title}</div><div class="lv"><div class="cl" id="cl"><div class="cat on" data-c="">📁 Todas las categorías<small>${all.length}</small></div>${shown.map(c=>`<div class="cat" data-c="${esc(c.id)}">📁 ${esc(c.name)}<small>${cnt[c.id]}</small></div>`).join('')}</div><div class="gw"><div class="row"><input id="q" placeholder="Buscar..."></div><div class="gs"><div class="grid" id="gr"></div><div class="mut" id="mr"></div></div></div></div>`
     :`<div class="h">${title}</div><div class="row"><input id="q" placeholder="Buscar..."></div><div class="grid" id="gr"></div><div class="mut" id="mr"></div>`;
   const cn={};cats.forEach(c=>cn[c.id]=c.name);
   const draw=()=>{const r=all.filter(x=>(!S.cat||x.cat==S.cat)&&(!S.q||x.name.toLowerCase().includes(S.q))&&(!S.kw||S.kw.test(cn[x.cat]||'')||S.kw.test(x.name)));
@@ -280,9 +281,10 @@ function chooser(){
   m.onclick=e=>{const b=e.target.closest('[data-o]');if(b){LS.set('eng',+b.dataset.o);toast('Reproductor guardado')}m.remove()};
   document.body.appendChild(m);
 }
+let PREVF=null;
 async function detail(it){
   const d=$('#dt'),isS=it.type=='series';
-  if(d.style.display!='block'){history.pushState({o:2},'');d.style.display='block'}
+  if(d.style.display!='block'){PREVF=document.activeElement;history.pushState({o:2},'');d.style.display='block'}
   d.scrollTop=0;const back='<button class="b s" onclick="history.back()">← Volver</button>';
   d.innerHTML=back+'<div class="mut">Cargando...</div>';
   let r={};try{r=await api(isS?'get_series_info':'get_vod_info',isS?'&series_id='+it.sid:'&vod_id='+it.vid)||{}}catch(e){}
@@ -291,9 +293,9 @@ async function detail(it){
   const rating=g('rating')||g('rating_5based'),meta=[g('country'),g('releasedate')||g('releaseDate')||g('release_date')].filter(Boolean).join(' | ');
   const chips=g('genre').split(/[,/|]/).map(x=>x.trim()).filter(Boolean).map(x=>`<span class="chip">${esc(x)}</span>`).join('');
   const line=(k,v)=>v?`<div class="ml ac"><span>${k}:</span>${esc(v)}</div>`:'';
-  const plot=g('plot')||g('description'),img=isS?(g('cover')||it.logo):(bd||g('movie_image')||it.logo);
+  const plot=g('plot')||g('description'),img=bd||(isS?(g('cover')||it.logo):(g('movie_image')||it.logo)),poster=!bd&&isS;
   const fav=favs().some(x=>x.id==it.id);R[it.id]=it;
-  d.innerHTML=`<div class="dtop">${back}<h1>${esc(it.name)}${rating?`<b>${esc(rating)}</b>`:''}</h1></div><div class="dh"><div>${meta?`<div class="ml" style="color:#aab6d8">${esc(meta)}</div>`:''}${chips?`<div class="ml"><span>Género:</span>${chips}</div>`:''}${line('Director',g('director'))}${line('Actores',g('cast')||g('actors'))}${plot?`<div class="ml"><span>Sinopsis:</span><div class="pl2" id="pt">${esc(plot)}</div>${plot.length>160?'<a id="mz" style="color:#2da1ff;font-weight:700;cursor:pointer">Más</a>':''}</div>`:''}<div class="ab"><button class="go" id="ba">▶ Reproducir</button><button id="bf">${fav?'★':'☆'} Favorito</button><button id="bp">⚙ Reproductor</button></div></div><div class="mdp${isS?' p':''}" id="mdp"><img src="${esc(img||'')}" onerror="this.style.opacity=0">${isS?'':'<i>▶</i>'}</div></div>
+  d.innerHTML=`<div class="dtop">${back}<h1>${esc(it.name)}${rating?`<b>${esc(rating)}</b>`:''}</h1></div><div class="dh"><div>${meta?`<div class="ml" style="color:#aab6d8">${esc(meta)}</div>`:''}${chips?`<div class="ml"><span>Género:</span>${chips}</div>`:''}${line('Director',g('director'))}${line('Actores',g('cast')||g('actors'))}${plot?`<div class="ml"><span>Sinopsis:</span><div class="pl2" id="pt">${esc(plot)}</div>${plot.length>160?'<a id="mz" style="color:#2da1ff;font-weight:700;cursor:pointer">Más</a>':''}</div>`:''}<div class="ab"><button class="go" id="ba">▶ Reproducir</button><button id="bf">${fav?'★':'☆'} Favorito</button><button id="bp">⚙ Reproductor</button></div></div><div class="mdp${poster?' pos':''}" id="mdp"><img src="${esc(img||'')}" onerror="this.style.opacity=0"><i>▶</i></div></div>
   <div id="sx"></div><div class="h"><span>Quizás te guste</span></div><div class="rw" id="sg"></div>`;
   if($('#mz'))$('#mz').onclick=()=>{const o=$('#pt').classList.toggle('open');$('#mz').textContent=o?'Menos':'Más'};
   $('#bf').onclick=()=>{$('#bf').textContent=(togFav(it)?'★':'☆')+' Favorito'};$('#bp').onclick=chooser;
@@ -308,11 +310,12 @@ async function detail(it){
       $('#se').onchange=e=>{sk=e.target.value;rg=0;draw()};document.querySelectorAll('[data-g]').forEach(a=>a.onclick=()=>{rg=+a.dataset.g;draw()});
       go=()=>{const e=L[rg*20];if(e)play(R['e'+e.id])};
     };
-    if(ks.length)draw();$('#mdp').onclick=null;
+    if(ks.length)draw();$('#mdp').onclick=()=>go();
   }
   $('#ba').onclick=()=>go();
   const pool=(await(isS?sers():vod())).filter(x=>x.id!=it.id&&(!it.cat||x.cat==it.cat));
   $('#sg').innerHTML=pool.sort(()=>Math.random()-.5).slice(0,12).map(card).join('');
+  if(d.style.display=='block'&&(!document.activeElement||document.activeElement===document.body||!d.contains(document.activeElement))&&$('#ba'))$('#ba').focus();
 }
 const openIt=it=>it&&(it.type!='live'&&(it.vid||it.sid)?detail(it):play(it));
 let LP=0,LT=null;
@@ -330,7 +333,20 @@ document.addEventListener('click',e=>{
   if(e.target.closest('#pb')){const m=$('#pm');m.style.display=m.style.display=='block'?'none':'block'}
 });
 $('#pbk').onclick=()=>history.back();
-onpopstate=()=>{if($('#pl').style.display=='flex'){CUR=null;stop();$('#pl').style.display='none'}else $('#dt').style.display='none'};
+const closePlayer=()=>{CUR=null;stop();$('#pl').style.display='none'};
+const closeDetail=()=>{$('#dt').style.display='none';if(PREVF&&document.contains(PREVF))try{PREVF.focus()}catch(e){}};
+function uiBack(){
+  if($('#pl').style.display=='flex'){closePlayer();return true}
+  if($('#dt').style.display=='block'){closeDetail();return true}
+  const m=$('#pm');if(m&&m.style.display=='block'){m.style.display='none';return true}
+  const a=document.activeElement;if(a&&a.tagName=='INPUT'&&!a.readOnly){delete a.dataset.on;a.readOnly=true;return true}
+  if(S&&S.v&&S.v!='inicio'&&$('#root').style.display!='none'){go('inicio');return true}
+  return false}
+onpopstate=()=>{if($('#pl').style.display=='flex')closePlayer();else closeDetail()};
+(()=>{const A=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.App;let last=0,call=0;
+  const onBack=()=>{const n=Date.now();if(n-call<300)return;call=n;if(uiBack())return;if(n-last<2000){if(A&&A.exitApp)A.exitApp();return}last=n;toast('Presiona atrás otra vez para salir')};
+  if(A&&A.addListener)A.addListener('backButton',onBack);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'||e.key==='GoBack'||e.key==='BrowserBack'){e.preventDefault();onBack()}})})();
 function qrMake(text){
   const D=new TextEncoder().encode(text),ECC=[-1,10,16,26,18,24,16,18,22,22,26],NB=[-1,1,1,1,2,2,4,4,4,5,5];
   const nAl=v=>v==1?0:Math.floor(v/7)+2;
@@ -400,6 +416,35 @@ async function qrLogin(){
 /* Control remoto (TV): enfoque con flechas y Enter */
 new MutationObserver(()=>document.querySelectorAll('.nv,.cat,.pc,.tl>div,.pf,.rg a,.ib,.pfb,.mdp,#pm div,[data-v]').forEach(e=>{if(!e.hasAttribute('tabindex'))e.tabIndex=0})).observe(document.body,{childList:true,subtree:true});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target&&e.target.matches&&e.target.matches('[tabindex]:not(button):not(input):not(select)')){e.preventDefault();e.target.click()}});
+const isTxt=t=>t&&t.tagName=='INPUT'&&!/^(checkbox|radio|button|submit|range|file)$/.test(t.type);
+const actInput=t=>{t.readOnly=false;t.blur();t.dataset.on=1;t.focus();try{t.setSelectionRange(t.value.length,t.value.length)}catch(e){}};
+document.addEventListener('pointerdown',e=>{if(isTxt(e.target))e.target.dataset.on=1},true);
+document.addEventListener('focusin',e=>{const t=e.target;if(isTxt(t)&&!t.dataset.on)t.readOnly=true},true);
+document.addEventListener('focusout',e=>{const t=e.target;if(isTxt(t)){delete t.dataset.on}},true);
+document.addEventListener('keydown',e=>{const t=e.target;if(isTxt(t)&&t.readOnly&&(e.key==='Enter'||e.key==='OK')){e.preventDefault();actInput(t)}},true);
+document.addEventListener('click',e=>{const t=e.target;if(isTxt(t)&&t.readOnly&&!t.dataset.on)actInput(t)},true);
+// (1) flechas del control: menú ⇄ carpetas ⇄ lista
+document.addEventListener('keydown',e=>{
+  if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft'&&e.key!=='ArrowDown')return;
+  const t=e.target;if(!t||!t.closest)return;
+  const f=el=>{if(!el)return false;e.preventDefault();el.focus();return true};
+  const cat=()=>document.querySelector('#cl .cat.on')||document.querySelector('#cl .cat');
+  const nav=()=>document.querySelector('#sb .nv.on')||document.querySelector('#sb .nv');
+  const first=()=>document.querySelector('#gr .pc');
+  if(e.key==='ArrowRight'){
+    if(t.closest('#sb'))return void f(cat());
+    if(t.classList.contains('cat'))return void f(first()||document.querySelector('#q'));
+  }else if(e.key==='ArrowLeft'){
+    if(t.classList.contains('cat'))return void f(nav());
+    if(t.id==='q'&&t.readOnly)return void f(cat());
+    if(t.classList.contains('pc')&&t.closest('#gr')&&document.querySelector('#cl')){
+      const L=[...document.querySelectorAll('#gr .pc')].slice(0,24).map(c=>c.getBoundingClientRect().left);
+      if(t.getBoundingClientRect().left<=Math.min(...L)+2)return void f(cat());
+    }
+  }else if(e.key==='ArrowDown'){
+    if(t.id==='q'&&t.readOnly)return void f(first());
+  }
+});
 document.addEventListener('focusin',e=>{if(e.target&&e.target.scrollIntoView)e.target.scrollIntoView({block:'nearest',inline:'nearest'})});
 C?load().then(profiles).catch(e=>login('No se pudo conectar: '+(e.message||e))):login();
 </script></body></html>
