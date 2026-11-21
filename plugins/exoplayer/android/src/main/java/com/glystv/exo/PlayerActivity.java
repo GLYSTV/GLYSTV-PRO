@@ -4,7 +4,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.content.res.ColorStateList;
+import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -46,6 +47,8 @@ public class PlayerActivity extends Activity {
     private boolean triedAlt = false;
     private int zoom = 0;
     private static final int HIDE_MS = 4000;
+    private static final int BAR_BOTTOM_DP = 10;
+    private static final int BAR_RIGHT_DP = 72;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable autoHide = new Runnable() {
         @Override public void run() {
@@ -77,17 +80,20 @@ public class PlayerActivity extends Activity {
 
         bar = new LinearLayout(this);
         bar.setOrientation(LinearLayout.HORIZONTAL);
-        bar.addView(mkBtn("Zoom", new View.OnClickListener() {
+        bar.addView(mkBtn("Zoom", "glys_ic_zoom", new View.OnClickListener() {
             @Override public void onClick(View v) { cycleZoom(); }
         }));
-        bar.addView(mkBtn("Subtítulos", new View.OnClickListener() {
+        bar.addView(mkBtn("Subtítulos", "glys_ic_subtitles", new View.OnClickListener() {
             @Override public void onClick(View v) { pick(C.TRACK_TYPE_TEXT, "Subtítulos"); }
         }));
-        bar.addView(mkBtn("Audio / idioma", new View.OnClickListener() {
-            @Override public void onClick(View v) { pick(C.TRACK_TYPE_AUDIO, "Audio / idioma"); }
+        bar.addView(mkBtn("Audio", "glys_ic_audio", new View.OnClickListener() {
+            @Override public void onClick(View v) { pick(C.TRACK_TYPE_AUDIO, "Audio e idioma"); }
         }));
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
-        lp.bottomMargin = dp(64);
+        // Abajo a la derecha, en la fila del tiempo (junto al engranaje), por debajo de la barra de progreso.
+        // Ajusta estos dos valores si quieres moverlos un poco: BAR_BOTTOM_DP (alto) y BAR_RIGHT_DP (distancia al engranaje).
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM | Gravity.END);
+        lp.bottomMargin = dp(BAR_BOTTOM_DP);
+        lp.rightMargin = dp(BAR_RIGHT_DP);
         root.addView(bar, lp);
         setContentView(root);
         hideUi();
@@ -148,7 +154,7 @@ public class PlayerActivity extends Activity {
 
     // Quita el cuadro de foco (verde) de los botones propios del reproductor
     private void noHighlight(View v) {
-        if (v == bar) return; // los botones Zoom/Subtítulos/Audio conservan su resalte azul
+        if (v == bar) return; // los botones Zoom/Subtítulos/Audio conservan su resalte de foco
         if (Build.VERSION.SDK_INT >= 26) v.setDefaultFocusHighlightEnabled(false);
         if (v instanceof ImageView) {
             v.setBackground(null);
@@ -170,24 +176,55 @@ public class PlayerActivity extends Activity {
         return (int) (v * getResources().getDisplayMetrics().density);
     }
 
-    private Button mkBtn(String text, View.OnClickListener l) {
+    private Button mkBtn(String text, String icon, View.OnClickListener l) {
         Button b = new Button(this);
         b.setText(text);
-        b.setTextColor(Color.WHITE);
         b.setAllCaps(false);
-        b.setTextSize(14);
+        b.setTextSize(13);
+        b.setTypeface(android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL));
+        b.setMinWidth(0);
+        b.setMinHeight(0);
+        b.setMinimumWidth(0);
+        b.setMinimumHeight(0);
+        b.setStateListAnimator(null);
+        b.setGravity(Gravity.CENTER_VERTICAL);
+
+        // Texto e icono: blanco normal, oscuro cuando tiene foco (mando de TV) o se pulsa
+        ColorStateList ink = new ColorStateList(
+                new int[][]{{android.R.attr.state_focused}, {android.R.attr.state_pressed}, {}},
+                new int[]{0xFF111111, 0xFF111111, 0xFFFFFFFF});
+        b.setTextColor(ink);
+        int id = getResources().getIdentifier(icon, "drawable", getPackageName());
+        if (id != 0) {
+            android.graphics.drawable.Drawable d = getResources().getDrawable(id, getTheme()).mutate();
+            int sz = dp(18);
+            d.setBounds(0, 0, sz, sz);
+            b.setCompoundDrawables(d, null, null, null);
+            b.setCompoundDrawablePadding(dp(7));
+            if (Build.VERSION.SDK_INT >= 23) b.setCompoundDrawableTintList(ink);
+        }
+
+        // Píldora translúcida con borde fino; con foco se rellena de blanco
         StateListDrawable sd = new StateListDrawable();
-        sd.addState(new int[]{android.R.attr.state_focused}, new ColorDrawable(0xFF2D7CFF));
-        sd.addState(new int[]{android.R.attr.state_pressed}, new ColorDrawable(0xFF2D7CFF));
-        sd.addState(new int[]{}, new ColorDrawable(0x99000000));
+        sd.addState(new int[]{android.R.attr.state_focused}, pill(0xFFFFFFFF, 0xFFFFFFFF));
+        sd.addState(new int[]{android.R.attr.state_pressed}, pill(0xFFFFFFFF, 0xFFFFFFFF));
+        sd.addState(new int[]{}, pill(0x8C000000, 0x40FFFFFF));
         b.setBackground(sd);
-        b.setPadding(dp(14), dp(6), dp(14), dp(6));
+        b.setPadding(dp(14), dp(8), dp(16), dp(8));
         b.setFocusable(true);
-        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(-2, -2);
-        p.setMargins(dp(6), 0, dp(6), 0);
+        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(-2, dp(38));
+        p.setMargins(dp(5), 0, dp(5), 0);
         b.setLayoutParams(p);
         b.setOnClickListener(l);
         return b;
+    }
+
+    private GradientDrawable pill(int fill, int stroke) {
+        GradientDrawable g = new GradientDrawable();
+        g.setColor(fill);
+        g.setCornerRadius(dp(19));
+        g.setStroke(dp(1), stroke);
+        return g;
     }
 
     private void cycleZoom() {
@@ -232,7 +269,7 @@ public class PlayerActivity extends Activity {
             Toast.makeText(this, type == C.TRACK_TYPE_TEXT ? "Sin subtítulos disponibles" : "Sin otras pistas de audio", Toast.LENGTH_SHORT).show();
             return;
         }
-        new AlertDialog.Builder(this)
+        new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
                 .setTitle(title)
                 .setSingleChoiceItems(names.toArray(new String[0]), sel, new android.content.DialogInterface.OnClickListener() {
                     @Override
@@ -282,4 +319,4 @@ public class PlayerActivity extends Activity {
             player = null;
         }
     }
-}
+            }
