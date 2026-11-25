@@ -1,0 +1,17 @@
+GLYSTV-PRO (app Android: celular, Google TV y TV box)
+
+Cómo compilar
+1. Sube TODO este contenido a la raíz del repositorio GLYSTV/GLYSTV-PRO.
+2. Borra del repositorio las carpetas y archivos de la versión web anterior (src, public, docs, scripts, www,
+   Dockerfile, docker-compose.yml, Caddyfile, next.config.ts, drizzle.config.json, etc.). Antes, guarda una copia
+   en otra rama (por ejemplo "servidor-web").
+3. Actions → "GLYSTV-PRO - Compilar APK" → Run workflow.
+
+Firma
+- Usa el mismo applicationId (com.glystv.pro) y la misma clave (signing/debug.keystore) de las versiones anteriores,
+  así que se instala encima de la app que ya tengas.
+- Si más adelante quieres una clave privada, crea el secreto GLYSTV_KEYSTORE_B64; el workflow lo usa primero.
+  (Cambiar de clave obliga a desinstalar e instalar una vez.)
+
+Incluye: ExoPlayer → VLC → MPV, actualización dentro de la app, selector de buffer, PIN SHA-256,
+index.html cifrado dentro del APK y APK no depurable.

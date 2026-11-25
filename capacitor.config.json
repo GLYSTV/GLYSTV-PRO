@@ -1,0 +1,18 @@
+{
+  "appId": "com.glystv.app",
+  "appName": "GLYSTV-PRO",
+  "webDir": "www",
+  "backgroundColor": "#060d1f",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  },
+  "android": {
+    "allowMixedContent": true
+  },
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
+}
