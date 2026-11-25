@@ -701,6 +701,63 @@ html body #home #tiles .tile[data-h=live]::after{content:""!important;top:50%!im
 </style>
 <style id="glystv-brand">@media(max-width:700px){#hch .home-hero.yhero{min-height:150px}}#login .brand .bi{display:none}#login .brand .logo{width:clamp(230px,30vw,380px);height:74px}#login .brand{justify-content:center}#login .brand>div{display:flex;flex-direction:column;align-items:center;text-align:center}</style>
 <script id="glystv-banner">(function(){try{var u='https://raw.githubusercontent.com/GLYSTV/GLYSTV-PRO/main/banner-inicio.jpg?v='+Math.floor(Date.now()/600000);var i=new Image();i.onload=function(){document.documentElement.style.setProperty('--hero-img','url("'+u+'")')};i.src=u}catch(e){}})();</script>
+<style id="glystv-home">
+/* ===== Inicio moderno (estilo XuperTV, azul · blanco · negro) ===== */
+/* 1) Banner: el cuadro toma la proporción de la imagen y la imagen lo llena */
+html body #home #hch .home-hero.yhero{min-height:0!important;aspect-ratio:1266/230;height:auto!important;border-radius:20px!important;border:1px solid rgba(90,150,255,.55)!important;box-shadow:0 14px 44px rgba(0,0,0,.7),0 0 34px rgba(45,110,255,.28)!important;margin-bottom:6px}
+html body #home #hch .home-hero.yhero .yh-art::before{display:none!important}
+html body #home #hch .home-hero.yhero .yh-art::after{background-size:cover!important;background-position:center!important}
+html body #home #hch .home-hero.yhero .yh-copy{padding:clamp(8px,1.4vw,18px)!important}
+html body #home #hch .home-hero.yhero .yh-btn{margin:0!important;background:linear-gradient(180deg,#2f8bff,#1757d8)!important;color:#fff!important;border:1px solid rgba(255,255,255,.55);padding:clamp(6px,.8vw,11px) clamp(16px,2vw,30px)!important;font-size:clamp(12px,1.2vw,17px)!important;box-shadow:0 6px 20px rgba(23,87,216,.55)!important;backdrop-filter:blur(4px)}
+@media(max-width:700px){html body #home #hch .home-hero.yhero{aspect-ratio:2.5/1}html body #home #hch .home-hero.yhero .yh-btn{font-size:13px!important;padding:6px 16px!important}}
+/* 2) Títulos de sección con barra azul y botón "Ver todos" tipo píldora */
+html body #home #hch .home-sec-head,html body #home #hch .featured-head{margin:clamp(14px,2vw,24px) 0 10px!important;align-items:center!important}
+html body #home #hch .home-sec-head h3,html body #home #hch .featured-head h3{position:relative;padding-left:14px;letter-spacing:.2px}
+html body #home #hch .home-sec-head h3::before,html body #home #hch .featured-head h3::before{content:"";position:absolute;left:0;top:50%;width:5px;height:1.25em;transform:translateY(-50%);border-radius:4px;background:linear-gradient(180deg,#5aa8ff,#1757d8);box-shadow:0 0 12px rgba(45,110,255,.7)}
+html body #home #hch .home-sec-head h3 svg,html body #home #hch .featured-head h3 svg{stroke:#5aa8ff!important}
+html body #home #hch .yall{background:rgba(45,110,255,.14)!important;border:1px solid rgba(90,150,255,.5)!important;color:#fff!important;border-radius:999px!important;padding:6px 16px!important;font-weight:700!important}
+html body #home #hch .yall:focus-visible,html body #home #hch .yall:hover{background:#2f6fe8!important;outline:2px solid #fff!important;outline-offset:2px}
+/* 3) Canales destacados: fichas de cristal con icono en círculo */
+html body #home #hch .featured-card{border-radius:18px!important;background:linear-gradient(160deg,#122244 0%,#0a0f1c 62%)!important;border:1px solid rgba(90,150,255,.38)!important;box-shadow:0 8px 22px rgba(0,0,0,.55)!important;transition:transform .16s,box-shadow .16s,border-color .16s}
+html body #home #hch .featured-card>svg{background:rgba(45,110,255,.22);border-radius:50%;padding:9px;box-sizing:content-box;stroke:#8cc2ff!important}
+html body #home #hch .featured-card:focus-visible,html body #home #hch .featured-card:hover{transform:translateY(-3px) scale(1.05);border-color:#fff!important;box-shadow:0 0 0 2px #fff,0 14px 30px rgba(23,87,216,.6)!important}
+/* 4) Pósters: más redondos, con sombra y brillo azul al enfocar */
+html body #home #hch .home-card{border-radius:16px!important;transition:transform .16s,box-shadow .16s}
+html body #home #hch .home-poster{border-radius:16px!important;box-shadow:0 10px 26px rgba(0,0,0,.65)!important;background:linear-gradient(150deg,#12244a,#05080f)!important}
+html body #home #hch .home-card:focus-visible,html body #home #hch .home-card:hover{transform:translateY(-4px) scale(1.06);z-index:3}
+html body #home #hch .home-card:focus-visible .home-poster,html body #home #hch .home-card:hover .home-poster{box-shadow:0 0 0 2px #fff,0 16px 34px rgba(23,87,216,.7)!important}
+html body #home #hch .home-progress i{background:linear-gradient(90deg,#2f8bff,#8cc2ff)!important}
+/* 5) Menú lateral: activo en azul, fichas con icono redondeado */
+html body #home #tiles .tile{border-radius:16px!important;transition:background .15s,transform .15s}
+html body #home #tiles .tile .ti{display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:rgba(45,110,255,.16)}
+html body #home #tiles .tile .ti svg{stroke:#8cc2ff!important}
+html body #home #tiles .tile:focus-visible,html body #home #tiles .tile:hover{background:rgba(45,110,255,.22)!important;color:#fff!important}
+html body #home #tiles .tile.on,html body #home #tiles .tile.act,html body #home #tiles .tile[aria-current]{background:linear-gradient(135deg,#2f8bff,#1757d8)!important;color:#fff!important;box-shadow:0 8px 22px rgba(23,87,216,.55)!important}
+html body #home #tiles .tile.on .ti,html body #home #tiles .tile.act .ti{background:rgba(255,255,255,.22)}
+html body #home #tiles .tile.on .ti svg,html body #home #tiles .tile.act .ti svg{stroke:#fff!important}
+/* 6) Barra de abajo: botones de cristal */
+html body #home #ybar{gap:10px!important;padding:8px 12px!important;background:linear-gradient(180deg,rgba(0,0,0,0),#000 40%)!important;border-top:0!important}
+html body #home #ybar button{border-radius:16px!important;background:rgba(45,110,255,.14)!important;border:1px solid rgba(90,150,255,.4)!important;color:#fff!important}
+html body #home #ybar button svg{stroke:#8cc2ff!important}
+html body #home #ybar button:focus-visible,html body #home #ybar button:hover{background:#2f6fe8!important;outline:2px solid #fff!important}
+
+html body #home #tiles .tile[data-h=home],html body #home #tiles .tile[data-h=home]:hover,html body #home #tiles .tile[data-h=home]:focus-visible,html body #home #tiles .tile[data-h=live],html body #home #tiles .tile[data-h=live]:hover,html body #home #tiles .tile[data-h=live]:focus-visible{background:linear-gradient(135deg,#2f8bff,#1757d8)!important;color:#fff!important;box-shadow:0 8px 24px rgba(23,87,216,.6)!important}
+html body #home #tiles .tile[data-h=home] .ti,html body #home #tiles .tile[data-h=live] .ti{background:rgba(255,255,255,.22)!important}
+html body #home #tiles .tile[data-h=home] .ti svg,html body #home #tiles .tile[data-h=live] .ti svg{stroke:#fff!important}
+html body #home #tiles .tile[data-h=home] small,html body #home #tiles .tile[data-h=live] small{color:rgba(255,255,255,.85)!important}
+@media(max-width:700px){html body #home #hch .home-hero.yhero .yh-copy{display:none!important}}
+
+
+html body #home #hch .home-card{flex:0 0 clamp(112px,11.5vw,180px)!important;width:clamp(112px,11.5vw,180px)!important;background:transparent!important;border:0!important}
+html body #home #hch .home-poster{flex:none!important;height:auto!important;aspect-ratio:2/3;width:100%!important}
+html body #home #hch .home-card .home-progress{top:auto!important;bottom:5px!important;left:9px!important;right:9px!important;height:5px!important;z-index:2}
+html body #home #hch .home-card-meta{display:none!important}
+html body #home #ybar button+button::before{display:none!important}
+
+
+html body #home #hch .home-card-name{display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden!important;min-height:0!important;line-height:1.2!important;font-size:clamp(11px,1.05vw,15px)!important;padding:22px 7px 8px!important}
+
+</style>
 </head>
 <body>
 <div id="intro" aria-hidden="true"><div class="ic"><div class="yi-logo"></div><div class="is">Fe que inspira… Contenido para toda la familia</div><div class="ib2"><i></i></div></div></div>
