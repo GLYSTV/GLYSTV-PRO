@@ -1,0 +1,131 @@
+name: GLYSTV-PRO - Compilar APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  android:
+    name: Crear GLYSTV-PRO Android
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Descargar proyecto
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Instalar Android SDK 36
+        run: |
+          SDKM="$(command -v sdkmanager || true)"
+          if [ -z "$SDKM" ]; then SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"; fi
+          if [ ! -x "$SDKM" ]; then SDKM="$(find "$ANDROID_HOME" "$ANDROID_SDK_ROOT" /usr/local/lib/android -name sdkmanager -type f 2>/dev/null | head -1)"; fi
+          echo "Usando sdkmanager en: $SDKM"
+          yes | "$SDKM" --licenses > /dev/null || true
+          "$SDKM" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Instalar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar Pillow
+        run: pip install Pillow
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Número de compilación (siempre mayor que las versiones anteriores)
+        run: echo "BN=$((${{ github.run_number }} + 1000))" >> "$GITHUB_ENV"
+
+      - name: Restaurar firma fija de la APK
+        env:
+          KS_B64: ${{ secrets.GLYSTV_KEYSTORE_B64 }}
+        run: |
+          KS="$RUNNER_TEMP/glystv.keystore"
+          if [ -n "$KS_B64" ]; then
+            # Quita espacios, saltos de línea y restos del prompt de Termux (~ $) por si se pegaron.
+            printf '%s' "$KS_B64" | tr -d ' \r\n~$' | base64 -d > "$KS"
+            echo "Firma: secreto GLYSTV_KEYSTORE_B64"
+          elif [ -f signing/debug.keystore ]; then
+            cp signing/debug.keystore "$KS"
+            echo "Firma: signing/debug.keystore del repositorio (la misma de las versiones anteriores de GLYSTV-PRO)"
+          else
+            echo "::error::No hay firma fija. Falta signing/debug.keystore o el secreto GLYSTV_KEYSTORE_B64."
+            exit 1
+          fi
+          keytool -list -v -keystore "$KS" -storepass android -alias androiddebugkey > "$RUNNER_TEMP/ks.txt" \
+            || { echo "::error::No se pudo leer la clave de firma (contraseña android, alias androiddebugkey)."; exit 1; }
+          KS_FP=$(grep 'SHA256:' "$RUNNER_TEMP/ks.txt" | head -1 | sed 's/.*SHA256: *//' | tr -d ':' | tr 'A-F' 'a-f')
+          echo "Huella SHA-256 de la clave fija: $KS_FP"
+          echo "KS_FP=$KS_FP" >> "$GITHUB_ENV"
+          echo "GLYSTV_KEYSTORE=$KS" >> "$GITHUB_ENV"
+          mkdir -p ~/.android && cp "$KS" ~/.android/debug.keystore
+
+      - name: Compilar GLYSTV-PRO
+        env:
+          BUILD_NUMBER: ${{ env.BN }}
+        run: bash build-glystv.sh
+
+      - name: Renombrar APK
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk GLYSTV-PRO.apk
+
+      - name: Verificar que la APK lleva la firma fija
+        run: |
+          APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          APK_FP=$("$APKSIGNER" verify --print-certs GLYSTV-PRO.apk | grep -i 'certificate SHA-256 digest' | head -1 | awk '{print $NF}' | tr 'A-F' 'a-f')
+          echo "Huella de la clave fija : $KS_FP"
+          echo "Huella firmada en la APK: $APK_FP"
+          if [ "$APK_FP" != "$KS_FP" ]; then
+            echo "::error::La APK NO está firmada con la clave fija. No se publica."
+            exit 1
+          fi
+          echo "OK: la APK usa la firma fija."
+
+      - name: Verificar que la APK no es depurable
+        run: |
+          AAPT2=$(ls "$ANDROID_HOME"/build-tools/*/aapt2 | sort -V | tail -1)
+          if "$AAPT2" dump badging GLYSTV-PRO.apk | grep -q "application-debuggable"; then
+            echo "::error::La APK sigue siendo depurable. No se publica."
+            exit 1
+          fi
+          echo "OK: la APK no es depurable."
+
+      - name: Guardar registro de errores
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GLYSTV-PRO-ERRORES
+          path: /tmp/gradle1.log
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Descargar APK GLYSTV-PRO
+        uses: actions/upload-artifact@v4
+        with:
+          name: GLYSTV-PRO
+          path: GLYSTV-PRO.apk
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Publicar Release GLYSTV-PRO
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: glystv-pro-${{ env.BN }}
+          name: GLYSTV-PRO v2.0 build ${{ env.BN }}
+          files: GLYSTV-PRO.apk
+          make_latest: true
+          
