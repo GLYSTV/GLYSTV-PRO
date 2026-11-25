@@ -18,3 +18,8 @@ index.html cifrado dentro del APK y APK no depurable.
 
 
 Actualización de interfaz: la lista muestra tandas de 12 elementos; las columnas de carpetas y canales usan filas compactas para facilitar ver más elementos en pantalla. En TV en vivo, un toque reproduce en el reproductor de vista previa de la columna derecha; doble toque amplía a pantalla completa.
+
+
+Banner de inicio ("Con Dios todo es posible")
+- La imagen es el archivo suelto banner-inicio.jpg (1266 x 230), no está dentro de index.html.
+- Para cambiarla algún día: reemplaza banner-inicio.jpg por otra imagen con el mismo nombre y de preferencia el mismo tamaño. La animación (zoom suave, destello de luz y botón que late) se aplica sola a la nueva imagen.

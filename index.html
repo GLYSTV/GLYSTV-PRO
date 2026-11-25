@@ -744,7 +744,7 @@ html body #home #tiles .tile[data-h=live]::after{content:""!important;top:50%!im
 .mg-btn{width:38px;height:38px;border-radius:50%!important;padding:0!important;display:grid;place-items:center;font-size:17px}
 </style>
 <style id="glystv-brand">@media(max-width:700px){#hch .home-hero.yhero{min-height:150px}}#login .brand .bi{display:none}#login .brand .logo{width:clamp(230px,30vw,380px);height:74px}#login .brand{justify-content:center}#login .brand>div{display:flex;flex-direction:column;align-items:center;text-align:center}</style>
-<script id="glystv-banner">(function(){try{var u='banner-inicio.jpg?v=2';var i=new Image();i.onload=function(){document.documentElement.style.setProperty('--hero-img','url("'+u+'")')};i.src=u}catch(e){}})();</script>
+<script id="glystv-banner">(function(){try{var u='banner-inicio.jpg?v=3';var i=new Image();i.onload=function(){document.documentElement.style.setProperty('--hero-img','url("'+u+'")')};i.src=u}catch(e){}})();</script>
 <style id="glystv-home">
 /* ===== Inicio moderno (estilo XuperTV, azul · blanco · negro) ===== */
 /* 1) Banner: el cuadro toma la proporción de la imagen y la imagen lo llena */
@@ -2979,5 +2979,24 @@ html body #br #ls:not(.grid) .ch .fv{font-size:calc(var(--chH,34px) * .55)!impor
 })();
 </script>
 
+
+<style id="glystv-banner-vida">
+/* ===== Banner de inicio con vida =====
+   La imagen NO está dentro de index.html: es el archivo suelto "banner-inicio.jpg" (1266 x 230).
+   Para cambiarla algún día, reemplaza ese archivo por otro con el mismo nombre y tamaño. */
+html body #home #hch .home-hero.yhero .yh-art::after{z-index:1;transform-origin:62% 50%;animation:yhKen 18s ease-in-out infinite alternate;will-change:transform}
+@keyframes yhKen{0%{transform:scale(1) translate3d(0,0,0)}100%{transform:scale(1.07) translate3d(-1.2%,.6%,0)}}
+/* destello de luz que cruza el banner */
+html body #home #hch .home-hero.yhero .yh-art::before{display:block!important;content:"";position:absolute;top:0;bottom:0;left:0;right:auto;width:38%;z-index:2;pointer-events:none;mix-blend-mode:screen;filter:none;
+ background:linear-gradient(105deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.26) 50%,rgba(255,255,255,0) 100%);
+ transform:translate3d(-120%,0,0) skewX(-14deg);animation:yhSheen 8s ease-in-out infinite}
+@keyframes yhSheen{0%,45%{transform:translate3d(-120%,0,0) skewX(-14deg)}100%{transform:translate3d(340%,0,0) skewX(-14deg)}}
+/* el botón "Ver Ahora" late suavemente */
+html body #home #hch .home-hero.yhero .yh-btn{animation:yhBtn 2.6s ease-in-out infinite}
+@keyframes yhBtn{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+@media (prefers-reduced-motion:reduce){
+ html body #home #hch .home-hero.yhero .yh-art::after,html body #home #hch .home-hero.yhero .yh-art::before,html body #home #hch .home-hero.yhero .yh-btn{animation:none!important}
+}
+</style>
 </body>
 </html>
