@@ -5,7 +5,9 @@ set -euo pipefail
 rm -rf www android
 mkdir www
 cp index.html www/
-[ -f banner-inicio.jpg ] && cp banner-inicio.jpg www/ || true
+for asset in banner-inicio.jpg banner.png icono.png; do
+  [ -f "$asset" ] && cp "$asset" www/ || true
+done
 # Versión real = número de la build (run_number de GitHub). Así la app instalada sabe qué versión es y deja de pedir actualizar.
 if [ -n "${BUILD_NUMBER:-}" ]; then
   VLABEL="v2.0 · build ${BUILD_NUMBER}"
