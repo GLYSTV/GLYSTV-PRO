@@ -15,3 +15,6 @@ Firma
 
 Incluye: ExoPlayer → VLC → MPV, actualización dentro de la app, selector de buffer, PIN SHA-256,
 index.html cifrado dentro del APK y APK no depurable.
+
+
+Actualización de interfaz: la lista muestra tandas de 12 elementos; las columnas de carpetas y canales usan filas compactas para facilitar ver más elementos en pantalla. En TV en vivo, un toque reproduce en el reproductor de vista previa de la columna derecha; doble toque amplía a pantalla completa.
