@@ -19,8 +19,8 @@ const chunks = out.toString('base64').match(/.{1,4000}/g).map(c => JSON.stringif
 const loader = `<!doctype html>
 <html data-glystv-protected="1"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#060d1f"><title>GLYSTV-PRO</title>
-<style>html,body{margin:0;background:#060d1f}</style></head><body>
+<meta name="theme-color" content="#000000"><title>GLYSTV-PRO</title>
+<style>html,body{margin:0;background:#000000}</style></head><body>
 <script>
 (function(){
 var D=[${chunks}].join(""),K=${JSON.stringify(key.toString('base64'))};

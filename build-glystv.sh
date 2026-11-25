@@ -3199,7 +3199,7 @@ print('iconos ok')
 ICONS
 fi
 BGXML=android/app/src/main/res/values/ic_launcher_background.xml
-[ -f "$BGXML" ] && sed -i -E 's#(<color name="ic_launcher_background">)[^<]*(</color>)#\1\#020712\2#' "$BGXML" || true
+[ -f "$BGXML" ] && sed -i -E 's#(<color name="ic_launcher_background">)[^<]*(</color>)#\1\#000000\2#' "$BGXML" || true
 
 # Pantalla de arranque (splash), barra de estado y colores del tema Android con la misma paleta Aurora del intro
 python3 - <<'SPLASHPY' || echo "AVISO: no se pudo personalizar el splash"
@@ -3209,7 +3209,7 @@ emb = Image.open('icono.png').convert('RGB')
 for f in glob.glob('android/app/src/main/res/drawable*/splash.png'):
     try:
         w, h = Image.open(f).size
-        im = Image.new('RGB', (w, h), (6, 13, 31))
+        im = Image.new('RGB', (w, h), (0, 0, 0))
         k = int(min(w, h) * 0.30)
         e = emb.resize((k, k), Image.LANCZOS)
         im.paste(e, ((w - k) // 2, (h - k) // 2))
@@ -3219,7 +3219,7 @@ for f in glob.glob('android/app/src/main/res/drawable*/splash.png'):
 print('splash ok')
 SPLASHPY
 COLXML=android/app/src/main/res/values/colors.xml
-[ -f "$COLXML" ] && sed -i -E 's#(<color name="colorPrimary">)[^<]*(</color>)#\1\#020712\2#; s#(<color name="colorPrimaryDark">)[^<]*(</color>)#\1\#020712\2#; s#(<color name="colorAccent">)[^<]*(</color>)#\1\#FFC928\2#' "$COLXML" || true
+[ -f "$COLXML" ] && sed -i -E 's#(<color name="colorPrimary">)[^<]*(</color>)#\1\#000000\2#; s#(<color name="colorPrimaryDark">)[^<]*(</color>)#\1\#000000\2#; s#(<color name="colorAccent">)[^<]*(</color>)#\1\#FFC928\2#' "$COLXML" || true
 
 sed -i 's#<application#<application android:usesCleartextTraffic="true"#' $MAN
 sed -i 's#</application>#    <activity android:name=".PlayerActivity" android:exported="false" android:configChanges="orientation|screenSize|keyboardHidden|screenLayout|smallestScreenSize" android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />\n    </application>#' $MAN
