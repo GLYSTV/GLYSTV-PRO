@@ -2866,5 +2866,63 @@ input,select,textarea{border-color:#71303c!important}
 @media(max-height:760px){#cc .cat{min-height:39px!important;height:39px!important;padding:5px 9px!important;margin:2px 0!important}}
 </style>
 
+
+<style id="glystv-landscape-14carpetas">
+/* ===== Pantalla 100% horizontal + 14 carpetas visibles en la primera columna =====
+   La altura de cada carpeta (--catH) la calcula el script de abajo para que quepan
+   14 filas sin importar el tamaño de la pantalla. Se conservan buscador, título y hora. */
+html body #br .brtop{padding:4px 12px!important;min-height:0!important;gap:8px!important;align-items:center!important}
+html body #br .brtop .ib{width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;padding:0!important;flex:none!important;border-radius:10px!important}
+html body #br .brtop .ib svg{width:18px!important;height:18px!important}
+html body #br .brtop>.t{font-size:16px!important;line-height:1.1!important;margin:0 0 0 4px!important}
+html body #br .brtop .cl{font-size:24px!important;line-height:1!important;margin:0 0 0 8px!important;letter-spacing:0!important}
+html body #br .brb{padding:0 10px 8px!important;gap:8px!important}
+html body #br #cc{display:block!important;padding:3px!important;gap:0!important;overflow-x:hidden!important;overflow-y:auto!important;scrollbar-width:none}
+html body #br #cc::-webkit-scrollbar{display:none}
+html body #br #cc .cth{height:var(--catH,27px)!important;min-height:0!important;margin:0 0 2px!important;padding:0 6px!important;display:flex!important;align-items:center!important;font-size:11px!important;line-height:1!important;white-space:nowrap!important;overflow:hidden!important}
+html body #br #cc .cat,html body #br #cc .cat.allch{
+ height:var(--catH,27px)!important;min-height:0!important;max-height:none!important;
+ margin:0 0 2px!important;padding:0 8px!important;gap:6px!important;
+ display:flex!important;align-items:center!important;box-sizing:border-box!important;
+ white-space:nowrap!important;overflow:hidden!important;line-height:1!important;
+ font-size:clamp(10px,calc(var(--catH,27px) * .42),14px)!important;border-radius:8px!important;flex:none!important}
+html body #br #cc .cat small{position:static!important;min-width:14px!important;font-size:inherit!important;flex:none!important;display:inline-block!important}
+html body #br #cc .cat span{flex:1!important;min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+html body #br #cc .cat em{flex:none!important;font-size:calc(var(--catH,27px) * .36)!important;line-height:1!important;padding:2px 6px!important}
+</style>
+<script id="glystv-landscape-14carpetas-js">
+(function(){
+ var N=14;                 /* carpetas visibles en la primera columna */
+ var GAP=2;                /* separación entre filas (px) */
+ function fit(){
+  try{
+   var br=document.getElementById('br'),cc=document.getElementById('cc');
+   if(!br||!cc||br.classList.contains('hide'))return;
+   var cs=getComputedStyle(cc);
+   var inner=cc.clientHeight-parseFloat(cs.paddingTop||0)-parseFloat(cs.paddingBottom||0);
+   if(!(inner>0))return;
+   var rows=N+(cc.querySelector('.cth')?1:0);
+   var h=(inner-rows*GAP)/rows-0.12;
+   h=Math.floor(Math.max(18,Math.min(h,44))*100)/100;
+   cc.style.setProperty('--catH',h+'px');
+  }catch(e){}
+ }
+ function later(){fit();requestAnimationFrame(fit);setTimeout(fit,120);setTimeout(fit,600)}
+ window.addEventListener('resize',later);
+ window.addEventListener('orientationchange',later);
+ document.addEventListener('DOMContentLoaded',function(){
+  var cc=document.getElementById('cc'),br=document.getElementById('br');
+  if(window.ResizeObserver&&cc)new ResizeObserver(fit).observe(cc);
+  if(window.MutationObserver){
+   if(cc)new MutationObserver(later).observe(cc,{childList:true});
+   if(br)new MutationObserver(later).observe(br,{attributes:true,attributeFilter:['class']});
+  }
+  later();
+ });
+ /* Bloqueo horizontal (donde el navegador lo permita; en la APK lo hace el AndroidManifest) */
+ try{if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(function(){})}catch(e){}
+})();
+</script>
+
 </body>
 </html>
