@@ -2899,9 +2899,26 @@ html body #br #cc .cat em{flex:none!important;font-size:calc(var(--catH,27px) * 
 /* TV en vivo: el panel de la derecha es el reproductor (lo que voy a ver / lo que estoy viendo) */
 html.np body #br:not(.vm) #pv:not(.fsx){display:grid!important}
 html body #br:not(.vm) #rt{display:flex!important;flex-direction:column!important;gap:0!important;padding:0!important;min-height:0!important;overflow:hidden!important;background:transparent!important;border:0!important;box-shadow:none!important}
-html body #br:not(.vm) #rt #pv:not(.fsx){flex:1 1 auto!important;width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;aspect-ratio:auto!important;border-radius:14px!important}
-html body #br:not(.vm) #rt #inf{display:none!important}
-/* Segunda columna (canales): 14 filas visibles */
+html body #br:not(.vm) #rt{gap:8px!important}
+html body #br:not(.vm) #rt #pv:not(.fsx){flex:0 0 auto!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;aspect-ratio:16/9!important;border-radius:14px!important}
+/* sin botones ni comandos dentro del cuadro pequeño (solo video); los controles quedan en pantalla completa */
+html body #br:not(.vm) #rt #pv:not(.fsx) #pvc{display:none!important}
+/* debajo del cuadro: lo que estoy viendo y lo que viene */
+html body #br:not(.vm) #rt #inf{display:block!important;flex:1 1 auto!important;min-height:0!important;overflow:hidden!important;padding:7px 10px!important;border-radius:14px!important}
+html body #br:not(.vm) #rt #inf>b{display:block;font-size:13px!important;line-height:1.15!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html body #br:not(.vm) #rt #inf .sub{display:none!important}
+html body #br:not(.vm) #rt #inf .eplive{padding:6px 8px!important;margin-top:6px!important;border-radius:10px!important}
+html body #br:not(.vm) #rt #inf .eplb{font-size:9px!important;padding:2px 6px!important;background:#2f86ff!important;color:#fff!important}
+html body #br:not(.vm) #rt #inf .eplt{font-size:11px!important}
+html body #br:not(.vm) #rt #inf .epln{font-size:13px!important;margin-top:4px!important;-webkit-line-clamp:1!important}
+html body #br:not(.vm) #rt #inf .eplbar{margin-top:5px!important;height:4px!important}
+html body #br:not(.vm) #rt #inf .eplq{font-size:10px!important;margin-top:3px!important}
+html body #br:not(.vm) #rt #inf .epnx{font-size:10px!important;margin-top:7px!important}
+html body #br:not(.vm) #rt #inf .ep{font-size:11px!important;line-height:1.25!important;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Películas y Series: misma columna de 12 carpetas, más ancha para leer los nombres */
+html body #br.vm .brb{grid-template-columns:225px minmax(0,1fr)!important}
+html body #br.vm #cc .cth{letter-spacing:0!important;text-transform:none!important;font-size:12px!important;overflow:hidden!important;text-overflow:ellipsis!important}
+/* Segunda columna (canales): 12 filas visibles */
 html body #br #ls:not(.grid){padding:3px!important;overflow-x:hidden!important;overflow-y:auto!important;scrollbar-width:none}
 html body #br #ls:not(.grid)::-webkit-scrollbar{display:none}
 html body #br #ls:not(.grid) .ch{
@@ -2918,7 +2935,7 @@ html body #br #ls:not(.grid) .ch .fv{font-size:calc(var(--chH,34px) * .55)!impor
 </style>
 <script id="glystv-landscape-14carpetas-js">
 (function(){
- var N=14;                 /* carpetas visibles en la primera columna */
+ var N=12;                 /* carpetas y canales visibles en las dos columnas */
  var GAP=2;                /* separación entre filas (px) */
  function fit(){
   try{
