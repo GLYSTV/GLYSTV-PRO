@@ -3583,22 +3583,28 @@ android {
 }
 NODEBUG
 # Firma fija: la misma clave en todas las versiones (así Android permite actualizar encima).
+# Las contraseñas NO están en el repositorio: llegan por variables de entorno (secrets de GitHub).
 if [ -n "${GLYSTV_KEYSTORE:-}" ] && [ -f "$GLYSTV_KEYSTORE" ]; then
+  if [ -z "${KEYSTORE_PASSWORD:-}" ] || [ -z "${KEY_ALIAS:-}" ] || [ -z "${KEY_PASSWORD:-}" ]; then
+    echo "ERROR: faltan KEYSTORE_PASSWORD / KEY_ALIAS / KEY_PASSWORD para firmar la APK."; exit 1
+  fi
 cat >> app/build.gradle <<'SIGN'
 
-// GLYSTV: firma fija (misma clave en todas las versiones)
+// GLYSTV: firma fija (misma clave en todas las versiones). Datos desde variables de entorno.
 android {
     signingConfigs {
         debug {
             storeFile file(System.getenv('GLYSTV_KEYSTORE'))
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
+            storePassword System.getenv('KEYSTORE_PASSWORD')
+            keyAlias System.getenv('KEY_ALIAS')
+            keyPassword System.getenv('KEY_PASSWORD')
         }
     }
 }
 SIGN
-echo "Firma fija configurada en app/build.gradle"
+echo "Firma fija configurada en app/build.gradle (contraseñas desde el entorno)"
+else
+  echo "ERROR: no hay llave de firma (GLYSTV_KEYSTORE). Esta compilación no genera APK sin firma fija."; exit 1
 fi
 # versionCode/versionName reales (Android los usa para saber que la APK nueva es una actualización)
 if [ -n "${BUILD_NUMBER:-}" ]; then

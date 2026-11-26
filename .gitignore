@@ -1,0 +1,11 @@
+# Llaves y contraseñas: nunca al repositorio
+*.jks
+*.keystore
+*.p12
+*.b64
+signing/
+local.properties
+node_modules/
+android/
+www/
+dist/

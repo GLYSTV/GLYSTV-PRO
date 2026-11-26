@@ -7,11 +7,18 @@ Cómo compilar
    en otra rama (por ejemplo "servidor-web").
 3. Actions → "GLYSTV-PRO - Compilar APK" → Run workflow.
 
-Firma
-- Usa el mismo applicationId (com.glystv.pro) y la misma clave (signing/debug.keystore) de las versiones anteriores,
-  así que se instala encima de la app que ya tengas.
-- Si más adelante quieres una clave privada, crea el secreto GLYSTV_KEYSTORE_B64; el workflow lo usa primero.
-  (Cambiar de clave obliga a desinstalar e instalar una vez.)
+Firma (sin contraseñas en el repositorio)
+- La llave y sus contraseñas viven SOLO en los secrets de GitHub (Settings > Secrets and variables > Actions):
+  KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD
+- Sin esos 4 secrets el workflow se detiene con un error claro (no compila APK con otra firma).
+- El workflow comprueba que la APK quedó firmada con esa llave y que no es depurable.
+- Crear los secrets (una sola vez): bash tools/crear-firma.sh nueva      (llave nueva; hay que desinstalar la app una vez)
+                                    bash tools/crear-firma.sh migrar signing/debug.keystore   (misma firma de antes, contraseña nueva; se instala encima)
+- Guarda el .jks y la contraseña fuera del repositorio. Si los pierdes, nadie podrá actualizar sin desinstalar.
+- Importante: la llave vieja (signing/debug.keystore, contraseña "android") estuvo en el repositorio y sigue en su historial.
+  Quien la copió puede firmar APK que se instalan como actualización. Con "migrar" la firma sigue siendo esa misma llave;
+  con "nueva" queda protegida.
+- Elimina la carpeta signing/ del repositorio (el workflow "Descomprimir ZIP" no borra archivos).
 
 Incluye: ExoPlayer → VLC → MPV, actualización dentro de la app, selector de buffer, PIN SHA-256,
 index.html cifrado dentro del APK y APK no depurable.
