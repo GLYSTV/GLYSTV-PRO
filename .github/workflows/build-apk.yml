@@ -50,34 +50,45 @@ jobs:
       - name: Número de compilación (siempre mayor que las versiones anteriores)
         run: echo "BN=$((${{ github.run_number }} + 1000))" >> "$GITHUB_ENV"
 
+      # Firma fija con secrets de GitHub (ninguna contraseña ni llave vive en el repositorio).
+      # Secrets del repositorio: KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD
       - name: Restaurar firma fija de la APK
         env:
-          KS_B64: ${{ secrets.GLYSTV_KEYSTORE_B64 }}
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          KS="$RUNNER_TEMP/glystv.keystore"
-          if [ -n "$KS_B64" ]; then
-            # Quita espacios, saltos de línea y restos del prompt de Termux (~ $) por si se pegaron.
-            printf '%s' "$KS_B64" | tr -d ' \r\n~$' | base64 -d > "$KS"
-            echo "Firma: secreto GLYSTV_KEYSTORE_B64"
-          elif [ -f signing/debug.keystore ]; then
-            cp signing/debug.keystore "$KS"
-            echo "Firma: signing/debug.keystore del repositorio (la misma de las versiones anteriores de GLYSTV-PRO)"
-          else
-            echo "::error::No hay firma fija. Falta signing/debug.keystore o el secreto GLYSTV_KEYSTORE_B64."
+          if [ -z "$KEYSTORE_BASE64" ] || [ -z "$KEYSTORE_PASSWORD" ] || [ -z "$KEY_ALIAS" ] || [ -z "$KEY_PASSWORD" ]; then
+            echo "::error::Faltan secrets: KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD (Settings > Secrets and variables > Actions). Sin llave fija no se compila."
             exit 1
           fi
-          keytool -list -v -keystore "$KS" -storepass android -alias androiddebugkey > "$RUNNER_TEMP/ks.txt" \
-            || { echo "::error::No se pudo leer la clave de firma (contraseña android, alias androiddebugkey)."; exit 1; }
+          KS="$RUNNER_TEMP/glystv.jks"
+          # Quita espacios y saltos de línea por si el secreto se pegó con ellos.
+          printf '%s' "$KEYSTORE_BASE64" | tr -d ' \r\n' | base64 -d > "$KS"
+          keytool -list -v -keystore "$KS" -storepass "$KEYSTORE_PASSWORD" -alias "$KEY_ALIAS" > "$RUNNER_TEMP/ks.txt" \
+            || { echo "::error::No se pudo leer la llave: revisa KEYSTORE_PASSWORD y KEY_ALIAS."; exit 1; }
           KS_FP=$(grep 'SHA256:' "$RUNNER_TEMP/ks.txt" | head -1 | sed 's/.*SHA256: *//' | tr -d ':' | tr 'A-F' 'a-f')
+          rm -f "$RUNNER_TEMP/ks.txt"
           echo "Huella SHA-256 de la clave fija: $KS_FP"
           echo "KS_FP=$KS_FP" >> "$GITHUB_ENV"
           echo "GLYSTV_KEYSTORE=$KS" >> "$GITHUB_ENV"
-          mkdir -p ~/.android && cp "$KS" ~/.android/debug.keystore
 
+      # Reintenta hasta 3 veces: Maven/Google a veces responden 429 (temporal).
       - name: Compilar GLYSTV-PRO
         env:
           BUILD_NUMBER: ${{ env.BN }}
-        run: bash build-glystv.sh
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          ok=0
+          for i in 1 2 3; do
+            if bash build-glystv.sh; then ok=1; break; fi
+            echo "::warning::Intento $i falló, reintentando en 90 s..."
+            sleep 90
+          done
+          [ "$ok" = 1 ]
 
       - name: Renombrar APK
         run: |
@@ -128,4 +139,5 @@ jobs:
           name: GLYSTV-PRO v2.0 build ${{ env.BN }}
           files: GLYSTV-PRO.apk
           make_latest: true
+
           
