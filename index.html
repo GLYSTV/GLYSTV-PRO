@@ -1123,6 +1123,10 @@ function homeRailsData(){var cat=homeCatalog(),newest=cat.filter(function(c){ret
 if(!HOME_BG.done){var hc=homeCacheLoad();newest=homeMerge(newest,hc.newest,60).sort(function(a,b){return homeAddedTime(b)-homeAddedTime(a)}).slice(0,24);series=homeMerge(series,hc.series,24)}
 return{newest:newest,series:series}}
 var HOME_ROWS={};
+var HOME_SAVE_T=0;
+function homeSaveSoon(force){try{var n=Date.now();if(!force&&n-HOME_SAVE_T<3000)return;var d=homeRailsData();if(d.newest.length||d.series.length){HOME_SAVE_T=n;homeCacheSave(d.newest,d.series)}}catch(e){}}
+document.addEventListener('visibilitychange',function(){if(document.hidden)homeSaveSoon(true)});
+window.addEventListener('pagehide',function(){homeSaveSoon(true)});
 function homeSection(title,row,items,empty,action){var a=(items||[]).slice(0,18);HOME_ROWS[row]=a;return '<section class="home-section"><div class="home-sec-head"><h3>'+title+'</h3><span class="sp"></span>'+(action?'<button type="button" data-home-action="'+action+'" class="yall">Ver Todos ›</button>':'')+'</div><div class="home-rail">'+(a.length?a.map(function(c,i){return homeCard(c,row,i)}).join(''):(HOME_BG.running?homeSkel():'<div class="home-empty">'+empty+'</div>'))+'</div></section>'}
 function homeAddedTime(c){var v=c&&c.added;if(v==null||v==='')return 0;var n=Number(v);if(isFinite(n)&&n>0)return n<1000000000000?n*1000:n;var d=Date.parse(v);return isNaN(d)?0:d}
 var RECV=[];
@@ -1139,7 +1143,7 @@ var HOME_BG={token:0,running:false,done:false};
 function homeBgLater(fn,ms){setTimeout(function(){if(typeof requestIdleCallback==='function')requestIdleCallback(fn,{timeout:1800});else fn()},ms||500)}
 function homeBgMap(raw,mode,cat){if(!Array.isArray(raw))raw=(raw&&typeof raw==='object')?Object.keys(raw).map(function(k){return raw[k]}):[];return raw.map(function(x){return mode==='vod'?{name:x.name,group:cat.name,logo:x.stream_icon||'',type:'vod',vid:x.stream_id,rt:x.rating,year:x.year||x.releaseDate||x.releasedate||'',added:x.added||x.last_modified||x.added_at||'',genre:x.genre||'',language:x.language||x.audio||'',url:S.sess.s+'/movie/'+enc(S.sess.u)+'/'+enc(S.sess.p)+'/'+x.stream_id+'.'+(x.container_extension||'mp4')}:{name:x.name,group:cat.name,logo:x.cover||'',type:'series',series_id:x.series_id,year:x.year||x.releaseDate||x.releasedate||'',added:x.last_modified||x.added||'',genre:x.genre||'',language:x.language||x.audio||''}}).filter(function(x){return x.name})}
 function startHomeBackground(){var ss=S.sess;if(!ss||ss.m3u||!ss.s||!ss.u||!ss.p||HOME_BG.running||HOME_BG.done)return;var token=++HOME_BG.token;HOME_BG.running=true;
-function showNow(){if($('home')&&!$('home').classList.contains('hide'))renderHomeRails()}
+function showNow(){if($('home')&&!$('home').classList.contains('hide'))renderHomeRails();homeSaveSoon()}
 /* Carpetas nuevas/estrenos primero; se piden varias a la vez y sin pausas largas. */
 var PRIO=/estreno|nuevo|reciente|novedad|2026|2025/i;
 async function loadMode(mode){var act=mode==='vod'?'get_vod_categories':'get_series_categories',cats=CC[mode];
@@ -1152,7 +1156,7 @@ n++;if(n===1||n%4===0)showNow();
 await new Promise(function(r){setTimeout(r,40)})}}
 await Promise.all([worker(),worker()])}
 async function run(){try{await Promise.all([loadMode('vod').catch(function(){}),loadMode('series').catch(function(){})]);
-if(token===HOME_BG.token){HOME_BG.done=true;try{var d=homeRailsData();homeCacheSave(d.newest,d.series)}catch(e){}showNow()}}
+if(token===HOME_BG.token){if(homeCatalog().length)HOME_BG.done=true;try{var d=homeRailsData();homeCacheSave(d.newest,d.series)}catch(e){}showNow()}}
 catch(err){/* La pantalla principal permanece utilizable aunque falle la precarga */}
 finally{if(token===HOME_BG.token){HOME_BG.running=false;showNow()}}}
 setTimeout(run,120)}
