@@ -461,7 +461,6 @@ public class NativePlayerPlugin extends Plugin {
     i.putExtra("epgU", call.getString("epgU", ""));
     i.putExtra("epgP", call.getString("epgP", ""));
     i.putExtra("tf", call.getInt("tf", 24));
-    i.putExtra("vlc", call.getInt("vlc", 0));
     getActivity().startActivity(i);
     call.resolve();
   }
@@ -1038,11 +1037,6 @@ public class PlayerActivity extends Activity {
   private boolean prefDone = false;
   private boolean slowRetried = false;
   private int stepSeq = 0;
-  /* Límite de arranque: si ExoPlayer no empieza a reproducir a tiempo, pasa a VLC (más rápido con servidores lentos). */
-  private static final long STARTUP_MS = 8000;
-  private int wdSeq = 0;
-  private boolean vlcFirstDone = false;
-  private long startSavedMs = 0;
   private final java.util.HashSet<String> triedUrls = new java.util.HashSet<>();
   private String firstInfo = "";
   private final Runnable clear = () -> status.setText("");
@@ -1246,7 +1240,6 @@ public class PlayerActivity extends Activity {
 
       @Override
       public void onRenderedFirstFrame() {
-        wdSeq++;
         rememberFormat();
         long sec10 = (android.os.SystemClock.elapsedRealtime() - t0) / 100;
         status.setText("Reproducción iniciada" + resumeNote);
@@ -2250,7 +2243,6 @@ public class PlayerActivity extends Activity {
       if (l.isEmpty()) return false;
       long pos = 0;
       try { if (player != null && !player.isCurrentMediaItemLive() && player.getDuration() > 0) pos = player.getCurrentPosition(); } catch (Throwable t) { pos = 0; }
-      try { if (pos <= 0 && startSavedMs > 0 && player != null && player.getDuration() <= 0) pos = startSavedMs; } catch (Throwable t) { /* ignorar */ }
       android.content.Intent i = new android.content.Intent(this, AltPlayerActivity.class);
       i.putExtra("url", l.get(0));
       i.putExtra("urls", l.toArray(new String[0]));
@@ -2390,30 +2382,8 @@ public class PlayerActivity extends Activity {
     } else {
       player.setMediaItem(item);
     }
-    startSavedMs = saved;
-    /* Opción manual (Ajustes > Motor de reproducción): películas y series abren directo con VLC */
-    if (!vlcFirstDone && getIntent().getIntExtra("vlc", 0) == 1) {
-      vlcFirstDone = true;
-      altLaunched = true;
-      if (launchAlt("vlc")) return;
-      altLaunched = false;
-    }
-    armStartupWatchdog();
     player.prepare();
     player.play();
-  }
-
-  /* Si a los STARTUP_MS ExoPlayer aún no está listo, abre VLC (conserva el punto donde ibas). */
-  private void armStartupWatchdog() {
-    final int sq = ++wdSeq;
-    status.postDelayed(() -> {
-      if (sq != wdSeq || player == null || isFinishing() || isDestroyed() || altLaunched) return;
-      int st = player.getPlaybackState();
-      if (st == Player.STATE_READY || st == Player.STATE_ENDED) return;
-      altLaunched = true;
-      status.setText("Cambiando a VLC para arrancar más rápido…");
-      if (!launchAlt("vlc")) altLaunched = false;
-    }, STARTUP_MS);
   }
 
   private String fmt(long ms) {
@@ -2444,7 +2414,6 @@ public class PlayerActivity extends Activity {
 
   @Override
   protected void onDestroy() {
-    wdSeq++;
     saveResume();
     if (NativePlayerPlugin.sleepTarget == this) NativePlayerPlugin.sleepTarget = null;
     if (player != null) player.release();
