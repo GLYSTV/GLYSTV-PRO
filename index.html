@@ -939,9 +939,9 @@ var AV=["😀","😎","🧑‍🚀","🦊","🐼","🦄","🐯","🤖"],CO=["#8b
 var SP=/evento|event|deport|sport|⚽|⚾|🏀|🏈|🥊|🏎|ppv|ufc|nba|mlb|nfl|f[uú]tbol|liga|espn/i;
 var PG=12;var S={mode:'live',cat:'',q:'',lim:PG,rn:0,items:[],viewIdx:[],viewKey:'',cats:[],prev:null,ep:false,chs:[],pf:ld('pro_pf',[{n:'Principal',a:'😎',c:CO[0]}]),pi:0,fav:[],rec:[],sess:ld('pro_sess',null),cur:null};
 var CC={},SC={};var CN={};
-/* ESTRENOS 2026 (películas): las primeras EST_N pasan al final de la lista. */
+/* ESTRENOS 2026 y SUPER ESTRENOS (películas): las primeras EST_N pasan al final de la lista. */
 var EST_N=100;
-function ordEst(c,l){if(S.mode==='vod'&&/estrenos?\s*2026/i.test(c.name||'')&&Array.isArray(l)&&l.length>EST_N){var r=c._ord;if(r&&r.src===l&&r.len===l.length)return r.out;var o=l.slice(EST_N).concat(l.slice(0,EST_N));c._ord={src:l,len:l.length,out:o};return o}return l}
+function ordEst(c,l){if(S.mode==='vod'&&/estrenos?\s*2026|super\s*estrenos/i.test(c.name||'')&&Array.isArray(l)&&l.length>EST_N){var r=c._ord;if(r&&r.src===l&&r.len===l.length)return r.out;var o=l.slice(EST_N).concat(l.slice(0,EST_N));c._ord={src:l,len:l.length,out:o};return o}return l}
 /* Conteo de contenido por carpeta (Películas/Series): una sola consulta por modo y sesión; se cuenta y se descarta. */
 function cnKey(mode){var s=S.sess;return s&&!s.m3u?mode+'|'+s.s+'|'+s.u:''}
 function folderCount(c){var k=cnKey(S.mode),m=k&&CN[k];
