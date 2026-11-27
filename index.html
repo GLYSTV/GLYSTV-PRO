@@ -1132,7 +1132,6 @@ function renderHomeRails(){var e=$('hch');if(!e)return;var d=homeRailsData(),new
 var hero=newest.length?newest[0]:null;HOME_ROWS.hero=hero?[hero]:[];
 var h='<button class="home-hero yhero" type="button" data-home-action="live" aria-label="Ver ahora"><span class="yh-art"></span><span class="yh-copy"><span class="yh-btn">▶ Ver Ahora</span></span></button>';
 h+='<section class="home-section"><div class="featured-head"><h3>'+ic('tv')+' TV en Vivo</h3><span class="sp"></span><button type="button" data-home-action="manage-featured" class="mg-btn" title="Gestionar canales" aria-label="Gestionar canales">⚙</button><button type="button" data-home-action="live" class="yall">Ver Todos ›</button></div><div class="featured-rail">'+HCH.map(function(x,i){var fc=hchFind(x),fl=fc&&fc.logo;return '<button class="featured-card'+(fc?'':' no')+(fl?' hl':'')+'" type="button" data-hc="'+i+'">'+(fl?'<img class="fc-logo" src="'+esc(fl)+'" loading="lazy" decoding="async" alt="" onerror="this.parentNode.classList.remove(\'hl\');this.remove()">':ic('tv'))+'<span class="fc-n">'+esc(x.label||x.name)+'</span></button>'}).join('')+'</div></section>';
-h+=recentRow();
 h+=homeSection(ic('movie')+' Películas','newest',newest,'Todavía no hay películas cargadas. Espera a que termine la carga del catálogo.','vod');
 h+=homeSection(ic('film')+' Series','series',series,'Todavía no hay series cargadas. Espera a que termine la carga del catálogo.','series');
 e.innerHTML=h;}
