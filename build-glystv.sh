@@ -910,7 +910,7 @@ public class NativePlayerPlugin extends Plugin {
     ctl.setVisibility(View.VISIBLE);
     if (tTitle != null && full) tTitle.setVisibility(View.VISIBLE);
     holder.removeCallbacks(hideCtl);
-    holder.postDelayed(hideCtl, 5000);
+    holder.postDelayed(hideCtl, 3000);
   }
 
   private void closeFull() {
